@@ -1,0 +1,20 @@
+- role: Data Scientist
+  company: University of Chicago
+  summary: Assemble novel datasets to study structural barriers to police reform
+  range: July 2022 - Feb. 2024
+- role: Graduate Research Assistant
+  company: University of Chicago
+  summary: Demonstrate viability of automated speech recognition on police radio broadcasts
+  range: Oct. 2021 - June 2022
+#- role: Simulation Engineer
+#  company: Concentric Inc
+#  summary: Design and implement methods for agent-based simulations
+#  range: Sept. 2019 - Mar. 2020
+#- role: Software QA Engineer
+#  company: Concentric Inc
+#  summary: Manage automated full-stack tests
+#  range: July 2016 - Aug. 2019
+- role: Previous roles ...
+  company:  ''
+  summary: ... see [resume](uploads/resume.pdf) or [LinkedIn](https://linkedin.com/in/eric-mc2)
+  range: ''

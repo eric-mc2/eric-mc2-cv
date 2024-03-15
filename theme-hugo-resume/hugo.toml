@@ -1,0 +1,37 @@
+baseURL = 'https://eric-mc2.github.io/'
+languageCode = 'en-us'
+title = 'Eric Chandler'
+theme = 'hugo-resume'
+
+PygmentsCodeFences = true
+PygmentsCodeFencesGuessSyntax = true
+PygmentsStyle = "monokai"
+enableGitInfo = false
+
+[params]
+address = "Chicago, IL"
+email = "echandle@alumni.cmu.edu"
+favicon = "img/favicon.png"
+firstName = "Eric"
+lastName = "Chandler"
+phone = "123-456-7890"
+profileImage = "img/headshot.png"
+showQr = false
+showContact = false
+showSocializations = true
+#sections = ["skills","publications","creations","contributions","experience","education","blog"]
+sections = ["education","experience","publications"]
+
+[[params.handles]]
+link = "https://www.linkedin.com/in/eric-mc2/"
+name = "LinkedIn"
+
+[[params.handles]]
+link = "https://github.com/eric-mc2/"
+name = "GitHub"
+
+[outputs]
+home = ["HTML", "JSON"]
+
+[taxonomies]
+tag = "tags"

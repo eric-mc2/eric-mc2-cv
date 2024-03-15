@@ -2,3 +2,6 @@
 	path = theme-hugo-resume/public
 	url = git@github.com:eric-mc2/eric-mc2.github.io.git
 	branch = main
+[submodule "theme-hugo-resume/themes/hugo-resume"]
+	path = theme-hugo-resume/themes/hugo-resume
+	url = git@github.com:eric-mc2/hugo-resume.git
