@@ -4,15 +4,15 @@
   range: "2020 - 2022"
   notes: |
     Courses included:
-    - "Police Reform and Police Legitimacy", "Crime Prevention"
-    - "Statistical Theory and Methods", "Program Evaluation"
-    - "Fundamentals of Deep Learning", "Ethics and Misuse in ML Systems"
+    - crime policy, police reform
+    - econometrics, inferential statistics
+    - machine learning, deep learning, ai ethics
 - school: "Carnegie Mellon University"
   degree: "BS" 
   major: "Physics, Minor Professional Writing"
   range: "2009 - 2013"
   notes: |
     Courses included:
-    - "Modeling Complex Social Systems", "Game Theory"
-    - "Science Writing", "Ethical Theory"
-    - Lots of physics and computer science courses
+    - science writing, ethical theory
+    - modeling complex social systems, game theory
+    - lots of physics and computer science courses
