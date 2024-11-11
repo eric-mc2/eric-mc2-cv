@@ -1,7 +1,6 @@
 baseURL = 'https://eric-mc2.github.io/'
 languageCode = 'en-us'
 title = 'Eric Chandler'
-theme = 'hugo-resume'
 
 PygmentsCodeFences = true
 PygmentsCodeFencesGuessSyntax = true
@@ -20,7 +19,7 @@ showQr = false
 showContact = false
 showSocializations = true
 #sections = ["skills","publications","creations","contributions","experience","education","blog"]
-sections = ["education","experience","publications","projects"]
+sections = ["education","experience","projects", "publications"]
 
 [[params.handles]]
 link = "https://www.linkedin.com/in/eric-mc2/"

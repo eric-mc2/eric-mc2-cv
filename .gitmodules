@@ -1,4 +1,3 @@
-[submodule "theme-hugo-resume/public"]
-	path = theme-hugo-resume/public
+[submodule "public"]
+	path = public
 	url = git@github.com:eric-mc2/eric-mc2.github.io.git
-	branch = main
