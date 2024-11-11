@@ -20,7 +20,7 @@ showQr = false
 showContact = false
 showSocializations = true
 #sections = ["skills","publications","creations","contributions","experience","education","blog"]
-sections = ["education","experience","publications"]
+sections = ["education","experience","publications","projects"]
 
 [[params.handles]]
 link = "https://www.linkedin.com/in/eric-mc2/"

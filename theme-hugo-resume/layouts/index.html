@@ -1,0 +1,16 @@
+{{ define "main" }}
+   {{ partial "about.html" .}}
+   {{ $sections := slice "publications" "projects" "blog" }}
+   {{ $site := .Site }}
+   {{ range .Site.Params.sections }}
+      {{ $sectionName := . }}
+      {{ if in $sections . }}
+         {{ with $site.GetPage "section" . }}
+            {{ .Scratch.Set "sectionId" $sectionName }} 
+            {{ partial "sectionSummary" . }}
+         {{ end }}
+      {{ else }}
+         {{ partial (printf "portfolio/%s" . ) $site }}
+      {{ end }}
+   {{ end }}
+{{ end }}
