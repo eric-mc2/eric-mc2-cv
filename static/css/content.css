@@ -1,0 +1,56 @@
+/* Old code */
+section.resume-section {
+  border-bottom: 1px solid #dee2e6;
+  padding-top: 5rem !important;
+  padding-bottom: 5rem !important;
+}
+
+section.resume-section .resume-item .resume-date {
+  min-width: none;
+}
+
+@media (min-width: 768px) {
+  section.resume-section {
+    min-height: 100vh;
+  }
+  section.resume-section .resume-item .resume-date {
+    min-width: 18rem;
+  }
+}
+
+@media (min-width: 992px) {
+  section.resume-section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+}
+
+section.resume-section .summary-item .publication-content {
+    flex-basis: 66%;  /* Take up about 66% of the width */
+}
+
+/* section.resume-section .summary-item .summary-img {
+    min-width: none;
+    max-width: 100%;
+
+} */
+
+section.resume-section .summary-item .summary-img {
+    flex-basis: 34%;  /* Restrict image container to around 34% */
+    max-width: 34%;   /* Ensure it doesn’t exceed its allocated space */
+}
+
+
+@media (min-width: 768px) {
+    section.resume-section .summary-item .summary-img{
+        min-width: 8rem;  /* Reduced from 18rem to give more space to text */
+    }
+    
+    /* Add styles for the image */
+    section.resume-section .summary-item .summary-img img {
+        max-height: 100%;  
+        padding: 5px;
+        max-width: 100%;  /* Let image fit within container */
+        object-fit: contain;  /* Maintain aspect ratio */
+    }
+}

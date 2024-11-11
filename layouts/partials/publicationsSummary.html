@@ -1,12 +1,27 @@
-
-<div class="resume-item d-flex flex-column flex-md-row mb-5">
+<!-- Old Code -->
+<!-- 
+<div class="summary-item d-flex flex-column flex-md-row mb-5">
   <div class="publication-content mr-auto">
     <h3 class="mb-0">{{ .Params.pubtype }} - <a href="{{ .Permalink }}">{{ .Params.title }}</a></h3>
-    <div>{{ .Params.description | safeHTML }}</div>
-    <!-- <p>{{ partial "techtags" . }}</p> -->
-  </div>
-  <div class="resume-date text-md-right">
-    <img src="{{ .Params.image }}" style="max-height:30%;padding:5px;"/>
     <span class="text-primary">{{ .Params.date | dateFormat "January 2006" }}</span>
+    <div>{{ .Params.description | safeHTML }}</div>
   </div>
+  <div class="summary-img text-md-right">
+    <img src="{{ .Params.image }}" style="max-height:30%;padding:5px;"/>
+  </div>
+</div> -->
+
+<!-- From Claude -->
+<div class="summary-item d-flex flex-column flex-md-row mb-5">
+    <div class="publication-content mr-auto pe-4">  <!-- Added pe-4 for padding -->
+        <h3 class="mb-0">{{ .Params.pubtype }} - <a href="{{ .Permalink }}">{{ .Params.title }}</a></h3>
+        <span class="text-primary">{{ .Params.date | dateFormat "January 2006" }}</span>
+        <div>{{ .Params.description | safeHTML }}</div>
+    </div>
+    <div class="summary-img text-md-right">
+        <img src="{{ .Params.image }}"/>
+    </div>
+    <!-- <div class="summary-img text-md-right flex-shrink-0">
+        <img src="{{ .Params.image }}" style="max-height:60%;padding:5px;"/>
+    </div> -->
 </div>

@@ -11,9 +11,12 @@
 }
 }
 
-img {
+/* Commenting out because it is overriding
+   list item previews. Find out what image
+   we actually want this to apply to. */
+/* img {
   max-width: 100% !important;
-}
+} */
 
 .p-0{
   margin: 0 auto;
@@ -23,12 +26,6 @@ img {
   font-size:1.5em;
       vertical-align: sub;
 }
-
-/* ensure items with short summarues push date over image */
-.publication-content{
-  width:90%;
-}
-
 
 h3{
     margin-top:40px;
