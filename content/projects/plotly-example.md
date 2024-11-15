@@ -9,6 +9,7 @@ link: "URL linked from project details page"
 fact: "Interesting little tidbit shown below image on summary and detail page"
 weight: 500
 plotly: true
+draft: true
 sitemap:
   priority : 0.8
 ---
