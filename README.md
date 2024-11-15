@@ -21,7 +21,11 @@ repo-root/
 Dev Instructions:
 
 1. Edit content and styling here.
-2. Run `hugo server --noHTTPCache --disableFastRender` to preview.
+2. Run `hugo server --noHTTPCache --disableFastRender --ignoreCache` to preview.
 3. Run `hugo -t <theme-name>` to build the site.
 4. cd to public/, commit, push to remote (eric-mc2.github.io) to deploy.
 5. cd to repo-root/, commit, push to remote (eric-mc2-cv) to save changes.
+
+**Attribution**
+
+Hugo theme [forked](https://github.com/eric-mc2/hugo-resume) from [hugo-resume](https://github.com/eddiewebb/hugo-resume) theme.

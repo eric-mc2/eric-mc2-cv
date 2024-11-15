@@ -34,3 +34,12 @@ home = ["HTML", "JSON"]
 
 [taxonomies]
 tag = "tags"
+
+# Cache-busting server options
+[server]
+  [[server.headers]]
+    for = "/**"
+    [server.headers.values]
+      Cache-Control = "no-cache, no-store, must-revalidate"
+      Pragma = "no-cache"
+      Expires = "0"
