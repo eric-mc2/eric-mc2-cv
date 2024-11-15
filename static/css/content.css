@@ -54,3 +54,14 @@ section.resume-section .summary-item .summary-img {
         object-fit: contain;  /* Maintain aspect ratio */
     }
 }
+
+.project-section h1 {
+    text-transform: uppercase;
+    font-size: 3rem;
+    line-height: 5.5rem;
+}
+
+.project-section h2 :not(.text-primary) {
+    text-transform: uppercase;
+    font-size: 2rem;
+  }
