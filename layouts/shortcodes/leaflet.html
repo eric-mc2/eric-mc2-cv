@@ -1,0 +1,61 @@
+{{ $json := .Get "json" }}
+{{ $height := .Get "height" | default "200px" }}
+<div id="map" class="leaflet" style="height:{{$height}};"></div>
+<script>
+    fetch({{ $json }})
+    .then(response => response.json())
+    .then(fig => {
+        // Initialize Leaflet map first
+        const minLat = Math.min(...fig.data.flatMap(d => 
+        d.lat.filter(val => val != null && !isNaN(val))
+        ));
+        const maxLat = Math.max(...fig.data.flatMap(d => 
+            d.lat.filter(val => val != null && !isNaN(val))
+        ));
+        const minLon = Math.min(...fig.data.flatMap(d => 
+            d.lon.filter(val => val != null && !isNaN(val))
+        ));
+        const maxLon = Math.max(...fig.data.flatMap(d => 
+            d.lon.filter(val => val != null && !isNaN(val))
+        ));
+        const centerLat = (minLat + maxLat) / 2
+        const centerLon = (minLon + maxLon) / 2
+        const map = L.map('map').setView([centerLat, centerLon], 10);
+        
+        // Carto is less visually distracting
+        L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+        // OSM style is a little too busy for this.
+        // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        // Convert Plotly traces to Leaflet layers
+        fig.data.forEach(trace => {
+            if (trace.type === 'scattergeo' || trace.type === 'scatter') {
+                const latitudes = trace.lat;
+                const longitudes = trace.lon;
+                const color = trace.line?.color || 'blue';
+                const weight = trace.line?.width || 2;
+                
+                let points = [];
+                
+                for (let i = 0; i < latitudes.length; i++) {
+                    const lat = latitudes[i];
+                    const lon = longitudes[i];
+                    
+                    if (lat != null && lon != null && !isNaN(lat) && !isNaN(lon)) {
+                        // Add the point to the current segment if it's valid
+                        points.push([lat, lon]);
+                    } else if (points.length) {
+                        // End of a segment, draw it and reset points
+                        L.polyline(points, { color, weight }).addTo(map);
+                        points = []; // Reset points for the next segment
+                    }
+                }
+                
+                // Draw the last segment if it exists (in case there's no trailing null)
+                if (points.length) {
+                    L.polyline(points, { color, weight }).addTo(map);
+                }
+            }
+        });
+    });
+</script>
