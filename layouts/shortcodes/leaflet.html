@@ -1,26 +1,50 @@
 {{ $json := .Get "json" }}
 {{ $height := .Get "height" | default "200px" }}
-<div id="map" class="leaflet" style="height:{{$height}};"></div>
+<div id="{{$json}}" class="leaflet" style="height:{{$height}};"></div>
 <script>
+    function get_bounds(fig) {
+        if ('lat' in fig['data'][0]) {
+            // Data are list of points
+            var minLat = Math.min(...fig.data.flatMap(d => 
+            d.lat.filter(val => val != null && !isNaN(val))
+            ));
+            var maxLat = Math.max(...fig.data.flatMap(d => 
+                d.lat.filter(val => val != null && !isNaN(val))
+            ));
+            var minLon = Math.min(...fig.data.flatMap(d => 
+                d.lon.filter(val => val != null && !isNaN(val))
+            ));
+            var maxLon = Math.max(...fig.data.flatMap(d => 
+                d.lon.filter(val => val != null && !isNaN(val))
+            ));
+        } else if ('geojson' in fig['data'][0]) {
+            // Data are list of polygons
+            const lons = fig['data']
+                .flatMap(d => d['geojson']['features'])
+                .flatMap(f => f['geometry']['coordinates'])
+                .flatMap(cc => cc.map(([x, y]) => x))
+                .filter(x => x != null && !isNaN(x));
+            const lats = fig['data']
+                .flatMap(d => d['geojson']['features'])
+                .flatMap(f => f['geometry']['coordinates'])
+                .flatMap(cc => cc.map(([x, y]) => y))
+                .filter(y => y != null && !isNaN(y));
+            var minLat = Math.min(...lats);
+            var maxLat = Math.max(...lats);
+            var minLon = Math.min(...lons);
+            var maxLon = Math.max(...lons);
+        }
+        return [minLat, maxLat, minLon, maxLon]
+    }
+
     fetch({{ $json }})
     .then(response => response.json())
     .then(fig => {
         // Initialize Leaflet map first
-        const minLat = Math.min(...fig.data.flatMap(d => 
-        d.lat.filter(val => val != null && !isNaN(val))
-        ));
-        const maxLat = Math.max(...fig.data.flatMap(d => 
-            d.lat.filter(val => val != null && !isNaN(val))
-        ));
-        const minLon = Math.min(...fig.data.flatMap(d => 
-            d.lon.filter(val => val != null && !isNaN(val))
-        ));
-        const maxLon = Math.max(...fig.data.flatMap(d => 
-            d.lon.filter(val => val != null && !isNaN(val))
-        ));
+        const [minLat, maxLat, minLon, maxLon] = get_bounds(fig)
         const centerLat = (minLat + maxLat) / 2
         const centerLon = (minLon + maxLon) / 2
-        const map = L.map('map').setView([centerLat, centerLon], 10);
+        const map = L.map("{{$json}}").setView([centerLat, centerLon], 10);
         
         // Carto is less visually distracting
         L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
@@ -55,6 +79,16 @@
                 if (points.length) {
                     L.polyline(points, { color, weight }).addTo(map);
                 }
+            }
+            else if (trace.type === 'choropleth') {
+                L.geoJSON(trace.geojson, {
+                    style: feature => ({
+                        fillColor: feature.properties.cmap,
+                        weight: 1,
+                        opacity: 1,
+                        color: 'white',
+                        fillOpacity: 0.7
+                    })}).addTo(map);
             }
         });
     });
