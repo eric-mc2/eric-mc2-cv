@@ -51,8 +51,16 @@
         // OSM style is a little too busy for this.
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
+        // Create layer control to switch between facets
+        // So far I'm only graphing faceted polygon data. 
+        // The line data is not faceted. 
+        if (fig.data[0]['type'] === "choropleth") {
+            var layerControl = L.control.layers(null, {}, { collapsed: false }).addTo(map);
+            var layers = {};  // Store layers for later reference
+        }
+        
         // Convert Plotly traces to Leaflet layers
-        fig.data.forEach(trace => {
+        fig.data.forEach((trace, traceIndex) => {
             if (trace.type === 'scattergeo' || trace.type === 'scatter') {
                 const latitudes = trace.lat;
                 const longitudes = trace.lon;
@@ -81,7 +89,9 @@
                 }
             }
             else if (trace.type === 'choropleth') {
-                L.geoJSON(trace.geojson, {
+                const facetName = trace.name || `Layer ${traceIndex + 1}`;
+
+                const layer = L.geoJSON(trace.geojson, {
                     style: feature => ({
                         fillColor: feature.properties.cmap,
                         weight: 1,
@@ -89,7 +99,27 @@
                         color: 'white',
                         fillOpacity: 0.7
                     })}).addTo(map);
+                
+                // Add to layer control
+                layerControl.addOverlay(layer, facetName);
+                layers[facetName] = layer;
+
+                // Show first layer by default
+                if (traceIndex === 0) {
+                    layer.addTo(map);
+                }
             }
+        });
+
+        // Optional: Add radio button behavior (only one layer visible at a time)
+        map.on('overlayadd', e => {
+            Object.entries(layers).forEach(([name, layer]) => {
+                if (name !== e.name) {
+                    map.removeLayer(layer);
+                    layerControl.removeLayer(layer);
+                    layerControl.addOverlay(layer, name);
+                }
+            })
         });
     });
 </script>
