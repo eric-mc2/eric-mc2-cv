@@ -122,7 +122,7 @@ Now we know the immediate population served by each bus line.
 
 Since ridership is reported at different levels of granularity for each transit modality, I had to be careful how to spatially aggregate the data. My goal is to test whether local events, such as football games, have a measurable effect on transit. Associating transit stations to points of interest is straightforward -- each point is an unambiguous distance away. Associating shapes such as bus routes or census tracts is more ambiguous -- do we measure the distance to the closest bus stop or the furthest? The data doesn't tell us whether riders travel short or far distances along these routes. This ambiguity can create inaccurate regression estimates.
 
-![Distance to point-of-interest](/img/point-line-dist/point-line-dist.001.jpeg)
+![Distance to point-of-interest](/img/point-line-dist.jpeg)
 
 - Train: provides daily boarding counts per station. we do not know where each passenger exited, nor which direction or train route they took. 
 - Bus: provides daily boardings counts per route. we do not know how this breaks down per bus stop, nor the direction or stop passengers exited at.
@@ -140,6 +140,8 @@ Modality | Train | Bus | Bike | Uber
 **Line of arrival** | Inferred | Yes | No | No
 **Area of arrival** | Yes | No | Yes | Yes
 
+<!-- TODO: this isn't saying much. at least make it have a layer per transit type. -->
+
 I aggregated three comparable panels:
 
 - Point: train, bike
@@ -153,7 +155,7 @@ I aggregated three comparable panels:
 
 ### Divvy Locations
 
-The divvy historical data spans from xxx to xxxx. Over these years, the published
+The divvy historical data spans from 2013 to 2024. Over these years, the published
 schema has changed several times. This led to annoying, but forgiveable issues
 to work around:
 
@@ -172,46 +174,100 @@ But the divvy data contained two way worse problems:
 
 **Unstable station id's**
 
-In some batches, the station ID is an integer, while in others it is a UUID, and
-ID values do not uniquely identify a station. 
+In some batches, the station ID is an integer, while in others it is a UUID, 
+representing schema drift. This drift broke the one-to-one property of station IDs:
+60% of station IDs were one-to-many: they were associated with up to 4 unique stations.
 
-TODO: map of all stations with ID = 5
+![Non-unique IDs](/img/id-to-name.jpeg)
+
+For those not familiar with Chicago streets, these intersections are quite far apart:
+
+{{< leaflet json="/json/bike-id-name.json" height="500px" >}}
 
 The standard approach to resolving this issue is to create a column labeling each observation with
 the batch it came from (eg. "2024-Q1") and use (ID, batch) pairs as the new primary key.
-*This still didn't work*
+Although this fixes the one-to-many issue, it breaks the injective property of station IDs,
+making them many-to-one!
 
-TODO: why didn't it work?
+![Non-unique IDs](/img/id-batch-to-name.jpeg)
+
 
 **Unstable station name**
 
-This schema drift also affected station names. To be a useful ID, we need
-names to point to one unique station and unique stations to point to one name.
+Looking at the data this way, perhaps the station name is a sufficient primary key?
 
-TODO: 2x2 picture of good and bad set theoretic mappings.
+Unfortunately, station names were also not always one-to-one. For example, the following
+locations are all purportedly at Buckingham Fountain:
 
-*All "similar" stations should point to one unique station name.* 
+{{< leaflet json="/json/buckingham.json" height="500px" >}}
 
-Barring changes in spelling or extra characters, there were stations where the 
-cross-streets were renamed.
+Similarly, station names were also not always injective.
 
-TODO: picture of this violation
+**Imprecise station locations**
 
-*All "similar" station names should point to one unique station.*
+Recent Divvy historical data batches are published as single denormalized CSV's
+containing trip_start_location and trip_end_location geometries. 
+Maybe the points can be our primary keys?
 
-TODO: picture of this broken for name -> id
+At first glance, there are some ~900,000 unique points. At MOST I should expect a few thousand!
 
-TODO: picture of this broken for name -> location
+Maybe this is a floating point precision issue and the points are actually 
+well-clustered around their true station locations. Maybe I can derive a much
+smaller set of representative locations and snap each point to the closest one.
 
-**Unstable start and endpoints**
+*Attribute Group-By*: I group by attribute (e.g. name, id, batch), compute the 
+centroid of each group, and measure the maximum point-to-centroid distance per group.
+This quantifies the spread or imprecision in using names, ids, batches as primary keys
+to actually identify station locations.
 
-Since the data had moved from a normalized to a denormalized format, maybe the 
-actual lat/long locations could serve as primary keys to identify stations? After
-the issues with the names and id colums, this was worth verifying.
+In code this would look something like:
+```python
+TOLERANCE = 1320  # feet
 
-TODO: Picture of how dispersed multiple nearby blobs can be
+def dispersion(x: gpd.GeoSeries, metric: Callable = np.std):
+    # Taking centroid of unique points makes us more sensitive to outlier mis-labeled data when
+    # using standard deviation as metric. When using max it makes no difference.
+    x = x.drop_duplicates()
+    c = MultiPoint(x.values).centroid
+    radius = metric(x.distance(c))
+    diam = radius * 2  # very rough
+    return diam
 
-TOOD: Picture of how dispersed outliers can be.
+max_spread = bike_rides.to_crs(LOCAL_CRS)
+    .groupby('name')['geometry']
+    .transform(lambda x: dispersion(x, np.max))
+clusterable = max_spread < TOLERANCE
+```
+
+Based on this method, ~106,000 points can be reduced down to ~1,00 representative
+points, but the remaining ~786,000 points are too dispersed to confidently say
+the refer to the same point.
+
+<!-- TODO: change marker style based on if clustered or not. -->
+{{< leaflet json="/json/bike-clusters.json" height="500px" >}}
+
+*Spatial Clustering*:
+As seen above, these ID columns are not necessarly bijective, meaning they are
+over-specified. Maybe I should group the points purely by their location, and
+ignore their IDs.
+
+There are many ways to cluster points. I'll use an intuitive way as follows:
+
+1. Draw a buffer around each point (66ft is the typical Chicago [street width](https://www.chicago.gov/dam/city/depts/cdot/StreetandSitePlanDesignStandards407.pdf))
+2. Find all buffers that intersect (via unary union)
+    1. Each unioned buffer shape represents a candidate cluster
+    2. Build spatial index on these clusters
+4. For each point, determine which cluster it belongs to (via spatial index query)
+5. Break apart clusters that are:
+    1. Too dispersed
+    2. Have heterogenous attributes (e.g. station names)
+
+This method affirms the outcome of the attribute clustering performed above. The
+20% of data that is tightly spatially grouped do indeed represent unique stations.
+The other 80% of the data can be unioned into clusters that contain up to 7818
+points.
+
+<!-- TODO: Picture of how dispersed outliers can be. -->
 
 I have to conclude that these points actually represent user locations when
 they start/stop trips on their smartphone apps. The drift represents a combination
@@ -276,17 +332,17 @@ class ChiClient(Socrata):
 
 Usage comparison:
 
-```python-repl
-In [1]: client = Socrata("data.cityofchicago.org", app_token=None, timeout=60)
-In [2]: chi_client = ChiClient(60)
-In [3]: TOTAL_RIDERSHIP_TABLE = "6iiy-9s97"
-In [4]: print("Original response:")
+```shell
+In [1]: TOTAL_RIDERSHIP_TABLE = "6iiy-9s97"
+In [2]: soc_client = Socrata("data.cityofchicago.org", app_token=None, timeout=60)
+In [3]: chi_client = ChiClient(60)
+In [4]: original_data = soc_client.get(TOTAL_RIDERSHIP_TABLE, limit=5)
+In [5]: pretty_data = chi_client.get(TOTAL_RIDERSHIP_TABLE, limit=5)
+In [6]: print("Original response:", original_data, sep="\n")
 Original response:
-In [5]: print(client.get(TOTAL_RIDERSHIP_TABLE, limit=5))
 [{'service_date': '2001-01-01T00:00:00.000', 'day_type': 'U', 'bus': '297192', 'rail_boardings': '126455', 'total_rides': '423647'}, {'service_date': '2001-01-02T00:00:00.000', 'day_type': 'W', 'bus': '780827', 'rail_boardings': '501952', 'total_rides': '1282779'}, {'service_date': '2001-01-03T00:00:00.000', 'day_type': 'W', 'bus': '824923', 'rail_boardings': '536432', 'total_rides': '1361355'}, {'service_date': '2001-01-04T00:00:00.000', 'day_type': 'W', 'bus': '870021', 'rail_boardings': '550011', 'total_rides': '1420032'}, {'service_date': '2001-01-05T00:00:00.000', 'day_type': 'W', 'bus': '890426', 'rail_boardings': '557917', 'total_rides': '1448343'}]
-In [6]: print("DataFrame response:")
+In [7]: print("DataFrame response:", pretty_data, sep="\n")
 DataFrame response:
-In [7]: print(chi_client.get(TOTAL_RIDERSHIP_TABLE, limit=5))
   service_date day_type     bus  rail_boardings  total_rides
 0   2001-01-01        U  297192          126455       423647
 1   2001-01-02        W  780827          501952      1282779

@@ -62,6 +62,7 @@
         // Convert Plotly traces to Leaflet layers
         fig.data.forEach((trace, traceIndex) => {
             if (trace.type === 'scattergeo' || trace.type === 'scatter') {
+                // Line plot
                 const latitudes = trace.lat;
                 const longitudes = trace.lon;
                 const color = trace.line?.color || 'blue';
@@ -87,6 +88,17 @@
                 if (points.length) {
                     L.polyline(points, { color, weight }).addTo(map);
                 }
+            }
+            else if (trace.type === 'scattermap') {
+                // Point plot
+                const color = trace.marker?.color || 'blue';
+                const points = trace.lat
+                                .map((lat,i) => [trace.lon[i], lat])
+                                .filter(([lon,lat]) => lon != null && !isNaN(lon));
+                for (const [lon,lat] of points) {
+                    L.circle([lat,lon], {'color': color, 'radius': 20}).addTo(map);
+                }
+                
             }
             else if (trace.type === 'choropleth') {
                 const facetName = trace.name || `Layer ${traceIndex + 1}`;
