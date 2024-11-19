@@ -4,10 +4,9 @@ date: 2024-11-13T11:07:59-06:00
 featured: true
 pubtype: Dataset
 description: "Collecting a unified time series econometric dataset."
-tags: ["data science","open data", "Socrata", "Amazon S3", "geopandas", "panel data"]
+tags: ["data science","open data", "urban science", "Socrata", "Amazon S3", "geopandas"]
 image: ""
 link: "https://github.com/eric-mc2/DNCTransit"
-fact: "Interesting little tidbit shown below image on summary and detail page"
 leaflet: true
 weight: 500
 sitemap:
@@ -275,7 +274,7 @@ $$
 
 We can see that step 5 helps mitigate this issue.
 
-{{< leaflet json="/json/spatial-bike-clusters.json" height="500px" >}}
+{{< leaflet json="/json/bike-spatial-cluster.json" height="500px" >}}
 
 I have to conclude that these points actually represent user locations when
 they start/stop trips on their smartphone apps. The drift represents a combination
