@@ -267,7 +267,15 @@ This method affirms the outcome of the attribute clustering performed above. The
 The other 80% of the data can be unioned into clusters that contain up to 7818
 points.
 
-<!-- TODO: Picture of how dispersed outliers can be. -->
+The buffer union method suffers from a transitivity issue: 
+
+$$
+\text{dist}(A,B) < d, \text{dist}(B,C) < d \not \Rightarrow \text{dist}(A,C) < d
+$$
+
+We can see that step 5 helps mitigate this issue.
+
+{{< leaflet json="/json/spatial-bike-clusters.json" height="500px" >}}
 
 I have to conclude that these points actually represent user locations when
 they start/stop trips on their smartphone apps. The drift represents a combination
@@ -282,6 +290,8 @@ and such. The problem is it's live and doesn't span the entire historical data r
 Given the schema drift issues presented above, I had no confidence the data was
 merge-able with anything but 2024 data. But since I only strictly need 2024 data for
 the models I plan to run, this limitation is acceptable. 
+
+*Problem solved!*
 
 ### Socrata to Data Frames
 
