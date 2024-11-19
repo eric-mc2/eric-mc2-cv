@@ -20,6 +20,7 @@ showContact = false
 showSocializations = true
 #sections = ["skills","publications","creations","contributions","experience","education","blog"]
 sections = ["education","experience","projects", "publications"]
+math = true
 
 [[params.handles]]
 link = "https://www.linkedin.com/in/eric-mc2/"
@@ -43,3 +44,12 @@ tag = "tags"
       Cache-Control = "no-cache, no-store, must-revalidate"
       Pragma = "no-cache"
       Expires = "0"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      [markup.goldmark.extensions.passthrough]
+        enable = true
+        [markup.goldmark.extensions.passthrough.delimiters]
+          block = [['\[', '\]'], ['$$', '$$']]
+          inline = [['\(', '\)']]
