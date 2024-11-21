@@ -9,6 +9,7 @@ image: ""
 link: "https://github.com/eric-mc2/DNCTransit"
 leaflet: true
 weight: 500
+math: true
 sitemap:
   priority : 0.8
 ---

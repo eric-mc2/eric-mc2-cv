@@ -8,6 +8,7 @@ image: ""
 pubtype: "Model"
 link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500
+math: true
 sitemap:
   priority : 0.8
 ---
@@ -15,9 +16,9 @@ sitemap:
 A few weeks ago I fumbled an interview question on statistical modeling. That
 hurt my pride, so I decided to take on a little modeling project. 
 
-Economists don't usually get to run their own controlled experiments, but they seem to
-keep their ears perked for cases when a policy is implemented with *some* 
-randomness. That's what I'm doing here. 
+I'll follow the standard economic practice of creating a quasi-experiment
+out of a policy implemented with *some* 
+randomness.
 
 > *I exploit the exogeneous shock of the 2024 Democratic National Convention in Chicago, (ie. the addition of tens of thousands of politically active Democrats) to test whether a statistically significant change in public transit is observed.*
 
@@ -25,15 +26,15 @@ Supposing this setup is statistically valid (FOOTNOTE), I expect public transit
 ridership to *increase* due to the DNC. This is because the Democratic coalition
 generally lives in urban areas, supports "green" policy, government spending, etc.
 
-I don't really have a stake in whether Democrats in general use transit or not,
+***Disclaimer***: I don't really have a stake in whether Democrats in general use transit or not,
 but I like this setup for a few reasons:
 
 - if *NO* effect is found, that is also interesting
     - it suggests a gap between talk and action in the Democratic leadership
-    - (usually null results are boring)
+    - (in most experiments null results are boring)
 - the premise is kinda click-baity
 - if the setup is not statistically valid, I can practice demonstrating that too
-    - (poorly tested statistics can have lasting effects on society)
+    - (poorly tested statistics can have lasting effects on society!)
     
 # The data
 
@@ -67,6 +68,24 @@ $$\text{rides}_i \sim \text{within 400m}_i + \text{within 800m}_i + \text{within
 I found that the effect was not monotonic as the buffer size increased. (Note that
 this equation specifies the marginal contribution of increasing the buffer size).
 In other words, the results will be very sensitive to the choice of buffer size.
+
+# TODO:
+
+*This blog post isn't finished!* I still have to write-up:
+
+- initial time series plots
+- power analysis (minimum statistically detectable effect)
+- regression models
+- robustness checks and extra models checking assumptions of regressions
+
+
+# At First Glance
+
+The [report](https://cdn.choosechicago.com/uploads/2024/10/TE-DNC-Impact.pdf) says 50k delegates spent $58.7M off-site.
+
+Let's simulate a 50k spike in transit and graph that compared to nominal levels.
+
+<!-- TODO: read up on IMPLAN models.  I feel like this is double-counting somewhere. -->
 
 # Why you shouldn't trust this
 
