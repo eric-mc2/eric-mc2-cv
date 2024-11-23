@@ -293,6 +293,9 @@ the models I plan to run, this limitation is acceptable.
 
 *Problem solved!*
 
+<!-- TODO: Plot given station geom vs imputed station geom as a vector between original and final points?
+So you get a vector cloud? Could look cool. Using the 5.x notebooks. -->
+
 ### Socrata to Data Frames
 
 As far as I could tell, the Socrata SoQL API returned all data as lists of lists of strings. Since I was making a lot of Socrata calls, I extended the Socrata client like so:
