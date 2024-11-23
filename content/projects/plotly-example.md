@@ -13,4 +13,4 @@ sitemap:
   priority : 0.8
 ---
 
-{{< plotly json="/dataviz/routes.json" height="500px" >}}
+{{< plotly json="/json/bus-route-rides.json" height="500px" >}}

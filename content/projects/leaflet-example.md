@@ -13,4 +13,4 @@ sitemap:
   priority : 0.8
 ---
 
-{{< leaflet json="/dataviz/routes.json" height="500px" >}}
+{{< leaflet json="/json/bus-route-rides.json" height="500px" >}}

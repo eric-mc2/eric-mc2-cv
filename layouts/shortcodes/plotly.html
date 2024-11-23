@@ -1,65 +1,8 @@
 {{ $json := .Get "json" }}
 {{ $height := .Get "height" | default "200px" }}
 <div id="{{$json}}" class="plotly" style="height:{{$height}};"></div>
-<script>
-    // From claude
-    d3.json({{ $json }}).then(function (fig) {
-        const minLat = Math.min(...fig.data.flatMap(d => 
-            d.lat.filter(val => val != null && !isNaN(val))
-        ));
-        const maxLat = Math.max(...fig.data.flatMap(d => 
-            d.lat.filter(val => val != null && !isNaN(val))
-        ));
-        const minLon = Math.min(...fig.data.flatMap(d => 
-            d.lon.filter(val => val != null && !isNaN(val))
-        ));
-        const maxLon = Math.max(...fig.data.flatMap(d => 
-            d.lon.filter(val => val != null && !isNaN(val))
-        ));
-
-        const basemapFigure = {
-            data: [{
-                type: 'scattergeo',
-                lon: [minLon, maxLon, maxLon, minLon, minLon],
-                lat: [minLat, minLat, maxLat, maxLat, minLat],
-                mode: 'lines',
-                line: {
-                    width: .1,
-                    color: 'rgba(0,0,0,0.2)'
-                }
-            }],
-            layout: {
-                geo: {
-                    projection: {
-                        type: 'web-mercator'
-                    },
-                    center: {
-                        lat: (minLat + maxLat) / 2,
-                        lon: (minLon + maxLon) / 2
-                    },
-                    // Calculate appropriate zoom level based on bounds
-                    lonaxis: {
-                        range: [minLon - .1, maxLon + .1]
-                    },
-                    lataxis: {
-                        range: [minLat - .1, maxLat + .1]
-                    },
-                    showframe: false,
-                    resolution: 50, // Increases tile resolution
-                    showland: true,
-                    landcolor: 'rgb(250, 250, 250)',
-                    showcoastlines: true,
-                    showcountries: true,
-                    countrycolor: 'rgb(200, 200, 200)',
-                    showsubunits: true, // Shows administrative boundaries
-                    subunitcolor: 'rgb(200, 200, 200)',
-                    showlakes: true,
-                    lakecolor: 'rgb(230, 230, 250)',
-                }
-            }
-        };
-        Plotly.react('{{$json}}', 
-            [basemapFigure.data[0], ...fig.data], 
-            {...basemapFigure.layout, ...fig.layout});
-    });
+<script type="module">
+    import {plot as plotlycustomplot} from "/js/plotly_custom.js";
+    d3.json({{ $json }})
+        .then(fig => plotlycustomplot(fig, "{{$json}}"));
 </script>
