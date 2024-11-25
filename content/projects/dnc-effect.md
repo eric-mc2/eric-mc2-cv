@@ -62,12 +62,13 @@ ridership nearby the convention centers, no matter what transit mode they choose
 # The data
 
 I have [constructed a panel dataset](../transit-panel/index.html) of transit ridership among train (CTA), bus (CTA), rideshare (uber, lyft, etc),
-and bikeshare (Divvy). The data is aggregated to daily ridership totals and spatially 
-aggregated three different ways:
+and bikeshare (Divvy). The data is aggregated to daily ridership totals at
+different spatial aggregations:
 
 - Per Station: train, bike
 - Per Route: train, bus
 - Per Census Tract: train, bike, uber
+- Per Community Area: train, bike, uber
 
 ## Points of Interest
 
@@ -82,7 +83,7 @@ I compute a buffer around each building and find all intersecting transit statio
 For robustness, I computed 400m, 800m, and 1600m buffers. To pick which catchement size to use, I was forced to choose
 one mile buffer, because the smaller sizes had too few intersecting stations and routes.
 
-![Transit serving catchement](/img/panel_sample.jpeg "Bus ridership is not known per stop.")
+![Bus ridership is not known per stop.](/img/panel_sample.jpeg "Transit serving convention areas.")
 
 To test the sensitivity of this specification, I modeled:
 
@@ -109,11 +110,10 @@ dates, or perhaps dates aligned with major concerts such as Lollapalooza, Suenos
 **Day of the Week**
 
 Commuting patterns have strong weekday/weekend polarity. CTA ridership is drastically
-higher on weekdays, while on weekends Uber ridership is higher. An ordinal 
-Day of the Week variable, or binary weekday/weekend variable is an important regression
-control to include.
+higher on weekdays, while on weekends Uber ridership is higher. I'll need to control
+for this in the regression.
 
-<!-- Include picture of sinusoid. -->
+{{< plotly json="/json/scaled-ts.json" height="500px" >}}
 
 ## Spatial Aggregation
 
@@ -140,13 +140,6 @@ travel away from the point of interest? What proportion of the line is somewhat
 With out a better model of rider destinations (ideally a source-destination matrix),
 I can't really address this with more accuracy.
 
-**Bus Routes vs Tracts**
-
-Bus ridership is only known at the line-level, so I have to *disaggregate*
-to the tract level. I use the "equal-ridership along the route" assumption: 
-I divide total route ridership equally per stop, such that tract ridership
-equals total route ridership / number of (intersecting) stops per tract.
-
 **Gravity and Catchement Models**
 
 A real urban mobility researcher would probably use some kind of diffusion
@@ -172,17 +165,6 @@ $$
 
 (For numeric stability, I scale lon/lat to zero-mean unit variance.)
 
-# TODO:
-
-*This blog post isn't finished!* I still have to write-up:
-
-- initial time series plots
-- power analysis (minimum statistically detectable effect)
-- regression models
-- robustness checks and extra models checking assumptions of regressions
-
-^^ Most of that work is already completed in [these](https://github.com/eric-mc2/DNCTransit/tree/main/notebooks/exploratory/2024/11/gut-check.ipynb) [notebooks](https://github.com/eric-mc2/DNCTransit/tree/main/notebooks/exploratory/2024/11/panel-models.ipynb).
-
 # The Sample
 
 **Weekends**
@@ -206,15 +188,53 @@ more complex modeling of seasonality. Second, transit has been on a long-term
 rebound since the pandemic, which is less noticeable on short time-scales: 
 I avoid needing to incorporate a parameter to account for this long-term trend.
 
-<!-- TODO: Baseline characteristics: just do a normal descriptive table of
-            sample size, mean of each variable.
--->
+
+**Boardings vs Trips**
+
+CTA train and bus data only provides the locations where riders *board* transit,
+not where they *exit*. Bike and rideshare data provides per-trip board *and* exit
+locations. For strict parity, I'd want to only consider *boarding* locations, but
+keeping the exit data gives a fuller picture of transit usage. In this scheme,
+bike and rideshare data are double-counted compared to train and bus: this 
+isn't an issue for regression as the difference in scale will be absorbed
+by the "transit" coefficient.
+
+## Baseline Characteristics 
+
+Here's a basic summary of the panel:
+
+{{< plotly json="/json/baseline-table.json" height="500px" >}}
+
+<!-- TODO: Balance table of UCMP vs NOT. -->
+
+# TODO:
+
+*This blog post isn't finished!* I still have to write-up:
+
+- power analysis (minimum statistically detectable effect)
+- regression models
+- robustness checks and checking model assumptions
+
+^^ Most of that work is already completed in [these](https://github.com/eric-mc2/DNCTransit/tree/main/notebooks/exploratory/2024/11/gut-check.ipynb) [notebooks](https://github.com/eric-mc2/DNCTransit/tree/main/notebooks/exploratory/2024/11/panel-models.ipynb).
+
 
 # Why you shouldn't trust this
 
 **Power**
 
-- a few thousand riders is a drop in the bucket compared to normal trends
+- may not have enough relevant observations to precisely estimate effect of DNC
+
+**Treatment Mis-Specification**
+
+- assumes riders cannot transfer train lines
+
+**Control Mis-Specification**
+
+- the control group should be "like" the treatment group, but I use the entire
+    city as a comparison. it's not apples-to-apples. a better control group might
+    be a handful of the major event/cultural institutions like Soldier Field, 
+    Wrigley Field, Guaranteed Rate Field, Art Institute. or finding matched pairs
+    based on covaraites.
 
 **Selection Bias**
 
@@ -222,7 +242,6 @@ I avoid needing to incorporate a parameter to account for this long-term trend.
     - i don't think this is bad because we dont really need external validity. we don't actually
     expect other sites in Chicago to have a similar response.
     
-
 **Spillover into control**
 
 - DNC visitors might stay in chicago longer than the official convention dates, 

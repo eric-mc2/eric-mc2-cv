@@ -83,3 +83,9 @@ a:hover, a:focus, a:active {
   color: #824027;
 }
 
+figcaption {
+    color: #a0a6ac;
+    font-style: italic;
+    font-size: .8rem;
+    text-align: center;
+}
