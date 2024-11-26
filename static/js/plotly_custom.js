@@ -3,7 +3,7 @@
 export function plot(fig, div_id) {
     const mode = fig.data[0]?.mode
     const figtype = fig.data[0]?.type
-    if (figtype === 'scatter' & mode === 'lines') {
+    if ((figtype === 'table') | (figtype === 'scatter' & mode === 'lines')) {
         Plotly.react(div_id, [...fig.data], {...fig.layout});
     } else {
         plot_geo(fig, div_id)

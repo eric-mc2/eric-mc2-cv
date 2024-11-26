@@ -1,0 +1,42 @@
+.scientific-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-size: 0.9rem;
+}
+
+.scientific-table table thead {
+    background-color: #f4f4f4;
+    border-bottom: 2px solid #333;
+}
+
+.scientific-table table th, td {
+    padding: 0.5rem;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.scientific-table table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.scientific-table table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.scientific-table table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.scientific-table .statistical-column {
+    
+    text-align: right;
+}
+
+.scientific-table .total-row {
+    font-weight: bold;
+    background-color: #e9e9e9;
+}

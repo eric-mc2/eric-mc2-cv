@@ -1,5 +1,5 @@
 {{ $file := .Get "file" }}
 {{ $content := readFile $file }}
-<div id="{{$file}}" class="imported-markdown-table">
+<div id="{{$file}}" class="scientific-table">
     {{ $content | markdownify }}
 </div>

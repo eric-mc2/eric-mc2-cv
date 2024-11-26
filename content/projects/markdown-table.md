@@ -13,6 +13,4 @@ sitemap:
 
 # Example
 
-It's not very pretty.
-
-{{< import-md-table file="static/uploads/table.md" >}}
+{{< import-md-table file="static/uploads/example-table.md" >}}
