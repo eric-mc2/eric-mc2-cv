@@ -201,11 +201,22 @@ by the "transit" coefficient.
 
 ## Baseline Characteristics 
 
-Here's a basic summary of the panel:
+Here is a completness chart showing which days/units are missing data. Some
+community areas are regularly missing bike or uber data. Uber data would be missing due to anonymization.
+Without knowing the details of the anonymization rules, we can generally say
+there are triggered when fewer rides happen. For now I will drop both such data
+points but will impute them as zero rides as a robustness check. (Community areas with no 'L' service
+are excluded from this figure.)
 
-{{< plotly json="/json/baseline-table.json" height="500px" >}}
+![Missing Data](/img/missingness.jpg#scaledown)
 
-<!-- TODO: Balance table of UCMP vs NOT. -->
+Here is a balance table for the community area panel:
+
+{{< import-md-table file="static/uploads/comm-balance.md" >}}
+
+And for the route/line panel:
+
+{{< import-md-table file="static/uploads/line-balance.md" >}}
 
 # TODO:
 

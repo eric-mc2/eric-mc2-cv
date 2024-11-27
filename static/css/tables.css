@@ -1,5 +1,7 @@
 .scientific-table table {
-    width: 100%;
+    /* width: 100%; */ 
+     /* I think tables should be center-justified and narrow. 
+        If width causes much white space it is hard to read. */
     border-collapse: collapse;
     margin-bottom: 1rem;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;

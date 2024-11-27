@@ -147,3 +147,12 @@ div.skills-heading{
     img.qrcode {
       max-width: 300px !important;
     }
+
+img[src*="scaledown"] {
+    height: 80%;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+
+}
