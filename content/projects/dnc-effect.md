@@ -43,12 +43,13 @@ The [report](https://cdn.choosechicago.com/uploads/2024/10/TE-DNC-Impact.pdf)
 says 50,000 delegates visited and spent $58.7M within Chicago off-site of the convention itself.
 This would be a small blip in city-wide average daily CTA ridership (800,000).
 
-But the convention event is localised to the United Center and McCormick place.
+But we know convention event is localised to the United Center and McCormick place.
 When we only look at CTA routes serving this part of the city, the average
 daily ridership reduces to 325,000. An influx
 of 50,000 riders would mean a 15% day-over-day increase in this area.
 
-Breaking this down further, daily ridership is 136k for bus routes and 189,000 for train lines.
+Breaking this down further, daily ridership for nearby bus routes and train lines
+is 136,000 and 189,000.
 Selecting only nearby train *stations* (similar data is not available for bus *stops*), 
 average daily boardings are 11,000. To round out this picture, 
 there are 6,000 and 33,000 average daily bike and rideshare
@@ -61,14 +62,21 @@ ridership nearby the convention centers, no matter what transit mode they choose
 
 # The data
 
-I have [constructed a panel dataset](../transit-panel/index.html) of transit ridership among train (CTA), bus (CTA), rideshare (uber, lyft, etc),
-and bikeshare (Divvy). The data is aggregated to daily ridership totals at
-different spatial aggregations:
+I have [constructed a panel dataset](../transit-panel/index.html) of transit ridership among train (CTA), bus (CTA), rideshare (uber, lyft, etc), and bikeshare (Divvy). The original public data is published at 
+varying spatial aggregations:
 
-- Per Station: train, bike
-- Per Route: train, bus
-- Per Census Tract: train, bike, uber
-- Per Community Area: train, bike, uber
+- Train: per station
+- Bike: per station
+- Bus: per route
+- Rideshares: per tract / community area
+
+First I'll create separate models per transit type. Then I'll model train,
+bike, and rideshares jointly at the tract level, since I'm interested in 
+comparative/substitution effects. 
+
+Unfortunately though busses serve the most
+riders, I will leave them out, since I can't further disaggregate the route-level data.
+Routes that pass near the DNC still extend for miles beyond it.
 
 ## Points of Interest
 
@@ -85,18 +93,28 @@ one mile buffer, because the smaller sizes had too few intersecting stations and
 
 ![Bus ridership is not known per stop.](/img/panel_sample.jpeg "Transit serving convention areas.")
 
-To test the sensitivity of this specification, I modeled:
+To test the sensitivity of the buffer, I modeled:
 
 $$\text{rides}_i \sim \text{within 400m}_i + \text{within 800m}_i + \text{within 1600m}_i$$
 
-I found that the effect was not monotonic as the buffer size increased. (Note that
-this equation specifies the marginal contribution of increasing the buffer size).
-In other words, the results will be very sensitive to the choice of buffer size.
+Average rides per spatial unit varied irregularly as the buffer size increased,
+meaning results will be very sensitive to the choice of buffer size.
 
-**Airport**
+**Community Areas**
 
-I coded CTA stations/lines serving O'Hare and Midway airports. I plan to include
-as part of the treatment group in an alternate model specification.
+One problem with spatial intersects is that it will include areas that barely
+touch the buffer. This is not terrible for tracts: 50% of tract area is actually
+contained within the buffer. For the much larger Chicago community areas, only 
+25% of intersected area is within the buffer. 
+
+![Intersected community areas](/img/comms_sample.jpeg "Intersected community areas")
+
+I'd wanted to use the community area aggregation because it contains about 30% more
+uber rides that were redacted at the tract level. But widening the "treatment"
+area this much is going to bias a statistical model towards showing zero effect.
+
+As a robustness check, I will run a model excluding tracts that barely touch 
+the buffer.
 
 ## Time-like Features
 
@@ -115,55 +133,63 @@ for this in the regression.
 
 {{< plotly json="/json/scaled-ts.json" height="500px" >}}
 
-## Spatial Aggregation
-
-**Train Stops -> Lines**
-
-There are two sources of uncertainty in aggregating station-level data to line-level data.
-First, this data does not indicate the direction of travel (e.g. N vs S). As a result,
-this interpretation of line ridership disregards direction and assumes passengers
-are equally likely to be anywhere along the line. Second,
-the data does not indicate the actual line boarded at hub stations serving multiple lines.
-To approximate this choice, I simply divide each station total by the number
-of lines served by the station.
-
-**Lines vs Point of Interest**
-
-I code a *binary* variable indicating if train lines, bus routes, or tracts
-*intersect* a point of interest (convention
-centers or airports). This lends to the simplistic interpretation that the line
-*"serves"* the point of interest.
-
-Obviously this leaves a lot of uncertainty unaddressed. How far does the line
-travel away from the point of interest? What proportion of the line is somewhat
-"close" to the point of interest? How is ridership distributed along the line?
-With out a better model of rider destinations (ideally a source-destination matrix),
-I can't really address this with more accuracy.
-
-**Gravity and Catchement Models**
-
-A real urban mobility researcher would probably use some kind of diffusion
-model, saying that rider origins are normally distributed around each station. 
-This might be more realistic but I don't have the capacity to estimate and
-incorporate this kind of complexity.
-
 ## Other Spatial Features
 
 **Transit Density**
 
-For the tract-level dataset, I spatially join tracts vs train stations and bus stops
-to find the distance to the nearest transit option. Could be a helpful covariate.
+For the tract-level dataset, I coded the distance to the nearest train, bus, and bike stop.
+These distances will help control for varying tract size, commercial density, and
+transit mode preferences.
 
 **Location**
 
-I include the stop/line/tract centroid longitude and latitude as a quadratic
-term in the model to capture basic city-wide demographic factors:
+I include the stop/tract centroid longitude and latitude as a quadratic
+term in the model to help control for basic city-wide demographic factors:
 
 $$
 \sim \beta_1\text{lon} + \beta_2\text{lat} + \beta_3\text{lon}*\text{lat} + \beta_4\text{lon}^2 + \beta_5\text{lat}^2
 $$
 
 (For numeric stability, I scale lon/lat to zero-mean unit variance.)
+
+## Spatial Aggregation
+
+**Train Stops -> Lines**
+
+Unfortunately, the CTA does not publish the number of *exits* per station, so
+I cannot directly count the number of *arrivals* to the DNC by train. 
+
+I considered aggregating station *boardings* along each *line*, but decided against
+it for the same reason I am excluding bus data.
+
+**Stops -> Tracts:**
+
+This is straightforward. Stops cannot belong to more than one tract.
+
+(You might argue that stops should be represented as cirles, not points, because
+people walk to them. Therefore we should attribute rides to tracts within those circles.
+To keep things simple I will not go to this level of detail.)
+
+<!-- For the line-level panel, aggregating station-level ridership to lines introduces
+two sources of uncertainty. First, the data does not indicate the actual line 
+boarded at hub stations serving multiple lines. To approximate this choice, 
+I simply divide each station total by the number of lines served by the station.
+Second, the data does not indicate riders' exit stations, direction of travel,
+or length of trip. If it did, I could model density along each route, but without this data I am 
+forced to assume equal ridership along the route.  -->
+
+<!-- **Lines vs Point of Interest** -->
+
+<!-- I code a *binary* variable indicating if train lines, bus routes, or tracts
+*intersect* a point of interest (convention
+centers or airports). This lends to the simplistic interpretation that the line
+*"serves"* the point of interest. -->
+
+<!-- Obviously this leaves a lot of uncertainty unaddressed. How far does the line
+travel away from the point of interest? What proportion of the line is somewhat
+"close" to the point of interest? How is ridership distributed along the line?
+With out a better model of rider destinations (ideally a source-destination matrix),
+I can't really address this with more accuracy. -->
 
 # The Sample
 
@@ -178,7 +204,7 @@ because the DNC doesn't even happen on these days.)
 For this same reason, I use *daily* observations. Aggregating the data to weeks
 would include extraneous variance due to weekends. It would also *attenuate* the
 treatment effect since the DNC only occurs on 4/7 days of the week -- the other
-3/7 days would require a form of "[noncompliance](https://en.wikipedia.org/wiki/Local_average_treatment_effect#Non-compliance_framework)" correction. 
+3/7 days would require correcting for "[noncompliance](https://en.wikipedia.org/wiki/Local_average_treatment_effect#Non-compliance_framework)".
 
 **Baseline Dates**
 
@@ -193,51 +219,103 @@ I avoid needing to incorporate a parameter to account for this long-term trend.
 
 CTA train and bus data only provides the locations where riders *board* transit,
 not where they *exit*. Bike and rideshare data provides per-trip board *and* exit
-locations. For strict parity, I'd want to only consider *boarding* locations, but
-keeping the exit data gives a fuller picture of transit usage. In this scheme,
+locations. For strict parity, I'd want to only consider trip *boarding* locations, but
+I'd rather keep the trip exits which give a fuller picture of transit usage. In this scheme,
 bike and rideshare data are double-counted compared to train and bus: this 
 isn't an issue for regression as the difference in scale will be absorbed
-by the "transit" coefficient.
+by adding a "transit mode" coefficient.
 
 ## Baseline Characteristics 
 
-Here is a completness chart showing which days/units are missing data. Some
+<!-- Here is a completness chart showing which days/units are missing data. Some
 community areas are regularly missing bike or uber data. Uber data would be missing due to anonymization.
 Without knowing the details of the anonymization rules, we can generally say
 there are triggered when fewer rides happen. For now I will drop both such data
-points but will impute them as zero rides as a robustness check. (Community areas with no 'L' service
-are excluded from this figure.)
+points. (As a robustness check, I'll run the model with these imputed as zero.)  -->
 
-![Missing Data](/img/missingness.jpg#scaledown)
+<!-- ![Missing Data](/img/missingness.jpg#scaledown) -->
 
-Here is a balance table for the community area panel:
+Here is a balance table for the tract panel:
 
-{{< import-md-table file="static/uploads/comm-balance.md" >}}
+{{< import-md-table file="static/uploads/tract-balance.md" >}}
 
-And for the route/line panel:
+We can see that the two groups are quite different before the DNC week. I will
+circle back to this issue.
 
-{{< import-md-table file="static/uploads/line-balance.md" >}}
+**Statistical Power**
+
+Before running the regression, I want to do a *slightly* more rigorous version
+of the time series [gut check](#at-first-glance). First, I'll look at the distribution of
+daily ridership and ask: what is the minimum number of additional rides to 
+significantly change the mean? In math, 
+
+$$ \text{MDE} = (z(1-\alpha / 2) + z(\beta)) \sigma $$
+
+{{< import-md-table file="static/uploads/mde.md" >}}
+
+This table is saying the tracts near DNC serve a daily average of 925 uber rides.
+That average would need to spike by an additional 438 rides to be statistically significant.
+Which equates to 1.4 rides per DNC attendee over the course of the event -- less than one round trip.
+
+Corraborating the first [time series plot](#at-first-glance), it looks like the event should be statistically detectable if
+most attendees are commuting.
+
+# Regression
+
+Finally!
+
+## Fixed Effects Model
+
+The fixed effects specification is great when you don't have enough control variables.
+It controls for all the ways that units are different at baseline -- all 
+time-invariant variables.
+
+The equation would look like:
+
+$$ \log(\text{rides}_{it}) \sim \beta_0 + \beta_1\text{DNC}_t + \beta_2 t + \alpha_i $$
+
+The convenience of FE is also its downside: the qualities of my treatment group and even
+the treatment "indicator" (distance to DNC) do not vary with time. These factors
+get subsumed in the unit fixed effect term \(\alpha_i\).
+Without being able to isolate the *area* of the DNC, this equation only shows city-wide
+effects during the DNC. 
+
+With this major caveat in mind, let's run the model (separate models per transit mode):
+
+{{< import-md-table file="static/uploads/fe.md" >}}
+
+The results show a -5.8%, -8.4, and +2.8% change in uber, train, and bike ridership
+during the DNC compared to other summer days.
+
+## Difference in Difference
+
+The difference in difference model isolates *both* the *area* and *time* of the DNC:
+
+$$ \log{rides_{it}} \sim \beta_0 + \beta_1 \text{DNC}_t + \beta_2 \text{nearby}_i + 
+    \beta_3 \text{DNC}_t \text{nearby}_i + 
+    X_{it} + u_{it} $$
+
+<!-- TODO: Explain model a little better. -->
+
+{{< import-md-table file="static/uploads/did.md" >}}
+
+The results show that at compared to the rest of Chicago, the DNC areas are 
+more heavily transited on Uber and bikes and less on trains. They agree directionally
+with the fixed effect model: that Uber and train ridership drops city-wide during the DNC
+by roughly similar percentages. And most importantly, they show that ridership
+in areas near the DNC during the DNC increases by a huge 18%, 68%, and 24%.
 
 # TODO:
 
 *This blog post isn't finished!* I still have to write-up:
 
-- power analysis (minimum statistically detectable effect)
-- regression models
-- robustness checks and checking model assumptions
+- checking model assumptions
+    - e.g. parallel trends in diff-in-diff
+- robustness checks
 
-^^ Most of that work is already completed in [these](https://github.com/eric-mc2/DNCTransit/tree/main/notebooks/exploratory/2024/11/gut-check.ipynb) [notebooks](https://github.com/eric-mc2/DNCTransit/tree/main/notebooks/exploratory/2024/11/panel-models.ipynb).
 
 
 # Why you shouldn't trust this
-
-**Power**
-
-- may not have enough relevant observations to precisely estimate effect of DNC
-
-**Treatment Mis-Specification**
-
-- assumes riders cannot transfer train lines
 
 **Control Mis-Specification**
 
@@ -272,3 +350,10 @@ And for the route/line panel:
 - the security perimeter around the event centers may actually suppress ridership
     - we can mitigate this by drawing larger buffers, but this weakens our identification strategy 
     (transit outside the perimeter might be spuriously correlated)
+
+**Gravity and Catchement Models**
+
+- A real urban mobility researcher would probably use some kind of diffusion 
+    model, saying that rider origins are normally distributed around each station. 
+    This might be more realistic but I don't have the capacity to estimate and
+    incorporate this kind of complexity.
