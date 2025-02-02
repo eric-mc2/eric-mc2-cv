@@ -2,8 +2,8 @@
 title: "527 Network Explorer"
 date: 2024-12-03T00:00:00-06:00
 featured: true
-pubtype: Viz
-description: "Network visualization of 527 political contributions."
+pubtype: Data Viz
+description: "Network visualization of 527 political contributions"
 tags: ["data science", "money in politics", "d3", "typescript"]
 image: ""
 link: "https://github.com/eric-mc2/527-explorer"

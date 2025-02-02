@@ -3,7 +3,7 @@ title: "Chicago Transit Ridership Panel"
 date: 2024-11-13T11:07:59-06:00
 featured: true
 pubtype: Dataset
-description: "Collecting a unified time series econometric dataset."
+description: "Collecting a time series dataset for urban policy"
 tags: ["data science","open data", "urban science", "Socrata", "Amazon S3", "geopandas"]
 image: ""
 link: "https://github.com/eric-mc2/DNCTransit"

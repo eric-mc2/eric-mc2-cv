@@ -2,8 +2,8 @@
 title: "Texas School Reading Scores"
 date: 2024-12-27T00:00:00-06:00
 featured: true
-pubtype: Viz
-description: "Dashboard of student achievement and community indicators."
+pubtype: Data Viz
+description: "Dashboard of student achievement and community indicators"
 tags: ["data science", "data visualization", "storytelling", "dashboard", "Observable Framework", "javascript"]
 image: ""
 link: "https://github.com/eric-mc2/reading-scores-demo"

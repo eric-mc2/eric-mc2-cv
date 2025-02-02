@@ -54,16 +54,23 @@ section.resume-section .summary-item .summary-img {
     }
 }
 
+.project-section h1 :not(.text-primary) {
+    text-transform: uppercase;
+    font-size: 2rem;
+  }
+
+
 .project-section h1 {
+    text-transform: uppercase;
+    font-size: 3.5rem;
+    line-height: 5.5rem;
+}
+
+.project-section h2 {
     text-transform: uppercase;
     font-size: 3rem;
     line-height: 5.5rem;
 }
-
-.project-section h2 :not(.text-primary) {
-    text-transform: uppercase;
-    font-size: 2rem;
-  }
 
 .project-section img {
     max-width: 100%;

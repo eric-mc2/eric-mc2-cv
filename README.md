@@ -22,7 +22,7 @@ Dev Instructions:
 
 1. Edit content and styling here.
 2. Run `hugo server --noHTTPCache --disableFastRender --ignoreCache --buildDrafts` to preview.
-3. Run `hugo -t <theme-name>` to build the site.
+3. Run `hugo` to build the site.
 4. commit, push to remote (eric-mc2-cv) to save changes.
 5. cd to public/, commit, push to remote (eric-mc2.github.io) to deploy.
 
