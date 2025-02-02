@@ -1,0 +1,5 @@
+{{ $file := .Get "file" }}
+{{ $content := readFile $file }}
+<div id="{{$file}}" class="scientific-table">
+    {{ safeHTML $content }}
+</div>
