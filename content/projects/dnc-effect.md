@@ -280,7 +280,12 @@ in the [next post](../dnc-effect-results/index.html).
 # Footnotes
 
 [^1]: Given this approach I will not be able to compare effect sizes *between* transit modes.
-Not until they are at least at the same aggregation.
+Unifying these data into one model is not trivial. To start, the construct we
+are interested in is *travel origins*. The best we have are *transit origins*, but these are
+not the same -- people need to walk the "last mile" from their true origin to the nearest station,
+potentially crossing census tracts. Second, transit modes are *substitutes*:
+modeling them together probably requires some kind of structural equation model
+to handle simultaneity.
 
 [^2]: Even at the tract level, 50% of "nearby" tract land area is outside the buffer. 
 As a robustness check, I should vary the spatial intersection threshold from 0% to 100% and test
