@@ -1,7 +1,6 @@
 ---
 title: "DNC Transit Effect? (Part 2)"
 date: 2025-01-08T10:47:51-06:00
-
 featured: true
 description: "Presenting the regression results"
 tags: ["data science", "econometrics", "panel data"]
@@ -10,7 +9,6 @@ pubtype: "Model"
 link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500
 math: true
-draft: true
 plotly: true
 sitemap:
   priority : 0.8
@@ -76,8 +74,8 @@ and *temporal* effects at the same time.
 
 $$\text{DiD} = \Delta \text{nearby} - \Delta \text{not nearby} $$
 
-In the formal model I include time trend, day-of-the-week dummies, distance to nearest transit, and
-quadratic lat/long terms[^2].
+In the formal[^2] model I include time trend, day-of-the-week dummies, distance to nearest transit, and
+quadratic lat/long terms[^3].
 
 $$ \log{rides_{it}} \sim \beta_0 + \beta_1 \text{DNC}_t + \beta_2 \text{nearby}_i + 
     \beta_3 \text{DNC}_t \text{nearby}_i + 
@@ -86,12 +84,11 @@ $$ \log{rides_{it}} \sim \beta_0 + \beta_1 \text{DNC}_t + \beta_2 \text{nearby}_
 {{< import-md-table file="static/uploads/did.md" >}}
 
 These results show a baseline difference in transit usage between convention 
-and non-convention areas. The city-wide temporal effects agree directionally 
-with the fixed-effect model: a -6.0%, -11.4%, and +1.2%
-percentage-point change in rideshares, train, and bike ridership. However, the
-interaction of near and during DNC shows positive effects across all transit modes:
-+21.4%, +101.8%, and +26.9% percentage-point
-changes in rideshares, train, and bike ridership. 
+and non-convention areas. In the control group we observe a (non-causal)
+-6.4%, -11.5%, -3.3% (NS) percentage-point change in rideshare, train, and bike 
+rides, which agrees directionally with the fixed-effects model. The
+causal effect of the DNC on rideshares, train, and bike rides 
+near the DNC is a +20.3%, +135.1%, and +35.0% percentage-point change.
 
 ### Parallel Trends
 
@@ -109,16 +106,37 @@ We also don't see any anticipatory effects leading up to the DNC event.
 
 # Conclusion
 
-TODO
+Areas near the DNC experience +20.3%, +135.1%, and +35.0% higher
+ridership (for rideshares, train, and bikes) compared to non-convention areas
+due to the DNC. This amounts to roughly[^4] 24k, 62k, and 3k extra rides.
 
-# Discussion
+We also observe that ridership in non-convention areas fell during the DNC by
+-6.4%, -11.5%, and +3.3% compared to their pre-DNC baseline. A loss of
+roughly 43k, 143k, and 3k rides. This loss cannot be interpreted as the causal 
+result of the DNC in particular.
 
-TODO
+Overall the evidence suggests that DNC attendees did in fact use and prefer public transit
+during their stay in Chicago. However, the event itself (and anticipated traffic) 
+may have suppressed mobility by an even greater extent across Chicago.
 
-In the [next post](../dnc-attendance/index.html), I'll evaluate whether I really find this model believable or not.
+Though we can easily measure what happened during the DNC, the counterfactual
+without the DNC is unknowable. Counterfactuals are important in 
+policy because they provide a second-best outcome upon which to base our decision
+(hosting the DNC vs not hosting). These quasi-experimental methods, Fixed Effects and 
+Difference-in-Difference regression, make a principled estimate of the counterfactual outcome,
+providing a point of comparison for the effect of the DNC itself. 
+
+In the [next post](../dnc-attendance/index.html), I list the prevailing issues with my regression design and 
+propose an adjustment to compellingly overcome the worst issue.
 
 # Footnotes
 
 [^1]: See [first](../dnc-effect/index.html#footnotes) footnote.
 
-[^2]: Omitted for visual clarity.
+[^2]: Estimated with weighted least squares (weighted by number of observations per unit)
+with clustered standard errors per unit.
+
+[^3]: Omitted for visual clarity.
+
+[^4]: Estimated total impact calculated as:
+$$\Delta \text{rides} = (e^\beta - 1) * E(\text{rides}_{it} | \text{Near DNC}_i * \text{Before DNC}_t) * \sum{\text{Near DNC}_i * \text{During DNC}_t}$$
