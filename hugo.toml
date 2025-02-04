@@ -6,6 +6,7 @@ PygmentsCodeFences = true
 PygmentsCodeFencesGuessSyntax = true
 PygmentsStyle = "monokai"
 enableGitInfo = false
+googleAnalytics = "G-3XT6HHHNVY"
 
 [params]
 address = "Chicago, IL"
