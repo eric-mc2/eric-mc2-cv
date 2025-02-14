@@ -14,8 +14,7 @@ sitemap:
   priority : 0.8
 ---
 
-A few weeks ago I fumbled an interview question on statistical modeling. That
-hurt my pride, so I decided to take on a little modeling project. 
+This research project asks:
 
 > **Does the exogeneous shock of the 2024 Democratic National Convention in Chicago induce significant impacts on public transit usage?**
 
@@ -29,9 +28,12 @@ Now for the results ...
 
 ## Fixed Effects Model
 
-The fixed effects specification is great when you don't have enough control variables.
-It controls for all the ways that units are different at baseline -- all 
-time-invariant variables.
+The fixed effects specification conveniently eliminates static sources of bias 
+without needing to explicitly measure each and every static variable
+(in other words it controls for all time-invariant unobserved factors). 
+If we believe we have controlled for dynamic factors, such that all other time-varying factors are uncorrelated
+with the treatment variable, then the FE model gives us an unbiased causal 
+estimate of the treatment effect.
 
 The equation includes an indicator for "during DNC", day-of-the-week dummies,
 time trend, and unit fixed effects:
@@ -56,21 +58,24 @@ bikes which are less affected by traffic).
 
 ## Difference in Difference
 
+Like fixed effects, the difference in difference model removes bias of
+time-invariant unobserved factors. Unlike fixed effects, we can include 
+time-invariant observed factors into the model. Additionally, diff-in-diff removes bias from
+dynamic factors that follow common time-trends between treatment and control groups.
+
 The difference in difference model isolates *both* the *area* and *time* of the DNC.
-First it compares near-DNC ridership during the DNC to near-DNC ridership before the DNC.
-This allows near-DNC areas to partially control for themselves. 
-
-$$\Delta \text{nearby} = E(\text{rides} | \text{nearby}, \text{during DNC}) 
-    - E(\text{rides} | \text{nearby}, \text{not during DNC})$$
-
-It does the same comparison
-for far-from-DNC areas. 
+First it compares pre/post among the control group.
 
 $$\Delta \text{not nearby} = E(\text{rides} | \text{not nearby}, \text{during DNC}) 
     - E(\text{rides} | \text{not nearby}, \text{not during DNC})$$
 
-The difference between these comparisons isolates the *spatial*
-and *temporal* effects at the same time.
+Then it compares pre/post among the treatment group.
+
+$$\Delta \text{nearby} = E(\text{rides} | \text{nearby}, \text{during DNC}) 
+    - E(\text{rides} | \text{nearby}, \text{not during DNC})$$
+
+Finally it takes the difference of these comparisons: the change in treatment group
+vs the change in control group. 
 
 $$\text{DiD} = \Delta \text{nearby} - \Delta \text{not nearby} $$
 

@@ -106,8 +106,10 @@ treatement units' at baseline. I can model
 $$ P(\text{near convention} | X) $$ 
 
 and then find other units with high probabilities that were in fact not near the DNC.
-But I don't have great X's to really discern "likeness". The best I can think of
-is an area's capacity to handle large crowds. This brings me to the "attendance" model.
+Unfortunately, I don't have a strong theoretical definition of "likeness", nor
+the data to measure it. Ideally I'd like to operationalize "ability to handle large crowds".
+I didn't see maximum fire code capacity in Chicago's building footprint dataset. 
+But I can measure attendance at crowded events.
 
 ## Attendance Model
 
@@ -117,21 +119,56 @@ because per-game sports attendance data is readily available[^1]. I also pull in
 conference event data for McCormick Place[^2].
 
 Now the control group is more "similar" in terms of its transit patterns. 
-I'll include event attendance as a term in the regression. The residuals on this term
-will help validate the veracity of the 50,000 delegate claim.
+I'll include event attendance as a variable in the regression. 
 
-One drawback of this method is that I can only now compare "event days", which
-don't typically overlap (Cubs and White Sox almost always play on opposite weekends).
+One drawback of this method is that I can only now compare "event days", drastically
+reducing the sample size. Worse, Soldier Field and Guaranteed Rate Field do not have
+games during the DNC, reducing the active control group just to transit options near
+Wrigley Field.
 
-I also have a much much smaller sample, so more uncertainty, less statistical power.
+![Event timeline](/img/attendance_timeline.jpeg "Event timeline.")
 
-## The Attendance Data
+The sample sizes are just too small.
 
-TBD: Data collection and analysis is implemented [here](https://github.com/eric-mc2/DNCTransit/tree/attend)
-but need to merge in some methods fixes and write up the results.
+## Stadium Model
 
-TL/DR: The new model did not pass the parallel trends test or the placebo treatment period test.
-So I'll show those tests and not the regression results.
+On second thought, using attendance as a regression variable makes it hard to 
+interpret our treatment effect. Ceteris peribus, I'd be modeling
+the effect of the DNC *in excess of the DNC attendees*. That's not at all what I want.
+
+Why not drop the attendance term, but keep the reduced sample of *transit near stadiums*
+on *all game/non-game days*. Now the treatment and control are much more similar
+in terms of transit density:
+
+{{< import-md-table file="static/uploads/balance-stadium.md" >}}
+
+I estimate the same difference in difference model as before:
+
+$$ \log{rides_{it}} \sim \beta_0 + \beta_1 \text{DNC}_t + \beta_2 \text{near DNC}_i + 
+    \beta_3 \text{DNC}_t \text{near DNC}_i +
+    X_{it} + u_{it} $$
+
+{{< import-md-table file="static/uploads/did-stadium.md" >}}
+
+In the control group we observe a (non-causal)
+-10.8%, -13.5% (NS), -9.1% (NS) percentage-point change in rideshare, train, and bike 
+rides, which agrees directionally with the un-subsetted data. The
+causal effect of the DNC on rideshares, train, and bike rides 
+near the DNC is a +31.6%, +145.5% (NS), and +56.7% percentage-point change,
+an increase in magnitude.
+
+As a robustness check on this model, I plot the parallel trends and run a placebo 
+test, shifting the simulated treatment period back across 8 x 4-day windows.
+38% of the simulated models returned statistically significant main effects,
+but the actual DNC effects (x's) were much larger than the simulated effects (box & whisker).
+
+![Placebo Test](/img/placebo_stadium.jpeg "Placebo Test.")
+
+# Conclusion
+
+I attempt to overcome selection effect bias by a pseudo-matched pairs method,
+comparing transit ridership near large event centers in Chicago. The results
+agree directionally and give credence to the original experimental design.
 
 # Footnotes
 
