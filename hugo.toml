@@ -47,6 +47,8 @@ tag = "tags"
       Expires = "0"
 
 [markup]
+  [markup.highlight]
+    style = "friendly"
   [markup.goldmark]
     [markup.goldmark.extensions]
       [markup.goldmark.extensions.passthrough]
