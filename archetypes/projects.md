@@ -8,6 +8,7 @@ image: ""
 link: "URL linked from project details page"
 weight: 500
 pubtype: ""
+draft: true
 sitemap:
   priority : 0.8
 ---

@@ -8,6 +8,7 @@ tags: ["techtags","used","in","website"]
 image: ""
 link: "URL linked from project details page"
 weight: 500
+draft: true
 sitemap:
   priority : 0.8
 ---
