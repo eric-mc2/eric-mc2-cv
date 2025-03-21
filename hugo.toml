@@ -10,7 +10,7 @@ googleAnalytics = "G-3XT6HHHNVY"
 
 [params]
 address = "Chicago, IL"
-email = "echandle@alumni.cmu.edu"
+email = ""
 favicon = "img/favicon.png"
 firstName = "Eric"
 lastName = "Chandler"
