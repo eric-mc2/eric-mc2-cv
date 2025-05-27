@@ -3,7 +3,7 @@ title: "Public Safety News Analysis (Engineering)"
 date: 2025-04-14T16:29:12-05:00
 featured: true
 description: "text analysis implementation"
-tags: ["machine learning","data engineering","spacy","nlp","dagster","mlflow"]
+tags: ["machine learning","data engineering","spacy","nlp","dagster","mlflow","GIS"]
 image: ""
 link: "https://github.com/eric-mc2/quantify-justice-news-geos/"
 weight: 500
@@ -14,57 +14,78 @@ sitemap:
 
 This post describes the technical implementation of the public safety news [analysis](../qjn/index.html).
 
-*Update: I've implemented a LOT more and need to update the writeup!*
+# Research Question
 
-## Training Data
+> *What is the spatial distribution of crime news coverage across Chicago?*
+
+I decompose this question into smaller machine learn-able tasks:
+
+1. Is the article crime-related? (classification)
+2. Which sentences in the article describe the crime *incident*? (classification)
+3. Which words refer to a location? (named entity recognition)
+5. Which location words relate to the *crime incident*? (dependency parsing)
+4. Which neighborhood is this in? (classification)
+
+# Data Sources
 
 **News articles**: 
-I labeled an independent sample to train each task. 
+The data is a sample of 713k articles from the Chicago Justice Project's news archive from
+201X onwards.
 
-**Chicago streets network**:
-I enumerated all blocks and intersections and spatially
-joined these with community area boundaries. I used these
-{location -> community area} mappings as synthetic data
-to train the classifier.
+News articles serve as training data for all five model stages.
 
-## Architecture
+**Chicago geographies**:
+Downloaded community area boundaries, neighborhood boundaries, street network
+from City of Chicago data portal.
+
+Geometries are used for exact matching and classification when possible. They
+are also used to generate synthetic training data for neighborhood classification.
+
+# Models
 
 **Article Classifier**:
-This is an off-the-shelf uninitialized binary text classification
-model. I only use article titles for classification, since they are
-much shorter and less noisy than article bodies.
+I classify articles as crime-related or not, based off of the *article title*,
+using Spacy's off-the-shelf binary text classifier (for the proof of concept, a unigram BOW).
+
+Articles tagged as non-crime-related are passed through the rest of the pipeline
+with no further processing.
 
 **Sentence Classifier**:
-This is an off-the-shelf uninitialized multi-label classification model. This model predicts whether the sentence describes the 
-WHO, WHAT, WHERE or WHEN of the crime incident. (I'm the
-least confident in this specific task formulation.)
+I classify whether each sentence from the article body describes the WHO, WHAT, HERE, or WHEN of the
+crime *incident*, using Spacy's off-the-shelf multi-label text classifier 
+(for the proof of concept, a unigram BOW).
 
-**Location recognition**:
-I extend the pre-trained named entity recognizer with custom pre-
-and post-inference steps. Spacy models are particularly
-easy to combine machine-learning and rules-based pipeline components. Before NER runs, I match on an explicit list of local
-vocabulary terms:
+**Location Recognition**:
+I created a custom Spacy Pipeline component for NER:
 
-* the "sides" of the city e.g. North Side, South Side
-* all street, neighborhood, and community area names
+1. Use Spacy's PhraseMatcher to efficiently check for exact matches against
+    a list of all Chicago street names, intersections, address blocks, 
+    neighborhoods, community areas, and "sides" (e.g. North Side).
+2. Run Spacy's pre-trained (tok2vec) NER model to identify more GPE (counties, cities) and FAC (highways, airports) entities.
+3. Clean up and merge entities.
+4. Tag entity with fine-grained location type, based on previous matching method.
 
-After NER runs, I match on conventions that are common to news language:
+This combination of rules-based and machine-learning consistently fixes
+common cases missed by the model, e.g. consolidating "(1300)[number] block of (North Webster Ave)[street]" 
+into "(1300 block of North Webster Ave)[street]".
 
-* "1300[number] block of North Webster Ave[street]" becomes "1300 block of North Webster Ave[block]"
+**Dependency Parsing**
+Not implemented yet. For the proof of concept, I include sentences
+that were positive matches for both sentence classification and location entity recognition.
 
-Finally I enhance the NER classification with finer-grained location terms, classifying whether the location is a block, street, intersection, neighborhood, or community area. 
-
-**Semantic Relationship**
-I use a naive implementation here. I just include sentences
-that were positive matches for both sentence classification and location entity recognition. I don't utilize the dependency parse
-or SRL models yet.
+Sentences that were negative matches for either stage are passed through the rest
+of the pipeline with no further processing.
 
 **Community Area Classification**
-The Chicago streets and neighborhood boundaries gives us an exact mapping of locations to community areas. I leverage this first, before resorting to machine learning. Given the location type provided by the NER stage, I check for an exact match of the location text and emit the associated community area.
+1. Predict neighborhood using Spacy's off-the-shelf multi-class text classification model
+    (for proof of concept, bi-gram BOW).
+    The training data for this model is half hand-labeled, half synthetic data
+    sampled from the city geometries.
+2. Tag blocks, intersections, and neighborhoods with their known community area,
+    based on their spatial relationships.
+3. Merge labels from machine learning and exact methods.
 
-Otherwise I send the location text through a text classification model, returning the predicted community area.
-
-## Infrastructure
+# Infrastructure
 
 I'm using [Dagster](https://dagster.io/) to explicitly
 declare and manage the separate pre-processing, training,
@@ -74,79 +95,86 @@ evaluation, and tuning steps per pipeline stage.
 
 ## Pipeline
 
-I have a bias towards file-centric pipeline declarations like Makefiles and [dvc](https://dvc.org/doc/user-guide/pipelines/defining-pipelines). These methods encourage making your processing code agnostic
-as to *where* data is located. Especially with dvc, it's very easy to quickly scan the 
-order that different files are created and the relationships between inputs, processing, and outputs. 
+I have a bias towards file-centric pipeline declarations like Makefiles and [dvc](https://dvc.org/doc/user-guide/pipelines/defining-pipelines), particularly the way these tools abstract *where* data is located
+away from the code operating on the data.
 
-### Data Discovery
+## Data Discovery
 
-I follow those concepts in my dagster definitions. First, I define all data paths
+My goal is to make it easy to quickly scan the order that data files are created and 
+the relationships between inputs, processing scripts, and outputs.
+First, I define all data paths
 in an external config file, which is organized by stage:
 
 ```yaml
-# data_sources.yaml
+# pipeline.yaml
 raw:
   article_text: "raw/articles.parquet"
-pre_relevance:
-  article_text: "pre_relevance/articles.parquet"
 art_relevance:
-  article_text_prototype: "art_relevance/articles_prototype.parquet"
-  article_text_preproc: "art_relevance/articles_preproc.json"
+  article_text_labeled: "art_relevance/articles_labeled.jsonl"
+  article_text_train: "art_relevance/articles_train.spacy"
+  article_text_test: "art_relevance/articles_test.spacy"
+sent_relevance:
+  article_text_labeled: "sent_relevance/articles_labeled.jsonl"
+  article_text_train: "sent_relevance/articles_train.spacy"
+  article_text_test: "sent_relevance/articles_test.spacy"
 ```
 
-Notice how these paths are *relative*. This allows the data folder itself to 
+These paths are *relative*, allowing the data folder itself to 
 be environment-specific, which is checked when the config is loaded. (For 
 local development it is just "./data" within the project folder. For running on
 Colab, it is a Google Drive path "/gdrive/MyDrive/.../data").
 
 ```python
+# script.py
 from scripts.utils import Config
 config = Config()
 print(config.get_data_path("raw.article_text"))
 "/absolute/path/to/project/data/raw/newsarticles.parquet"
 ```
 
-### Stage Declarations
+## Stage Declarations
 
-Next I define my dagster stages. The goal is to make this file really compact
+My goal is to make this file really compact
 and to highlight a) the logical stage dependencies and b) the input output 
 flows. To achieve this, I separate the actual processing logic to a different
 file `operations.py`. And as before, the actual data locations are
 isolated and loaded through the config file. 
 
 ```python
+# scripts/preprocessing/assets.py
+import dagster as dg
+from scripts.utils import Config
+from scripts.preprocessing import operations as ops
+config = Config()
+@dg.asset
+def extract(description="Unzip raw data"):
+    in_path = config.get_data_path("raw.zip")
+    out_path = config.get_data_path("raw.article_text")
+    ops.extract(in_path, out_path)
+
 # scripts/art_relevance/assets.py
 import dagster as dg
 from scripts.utils import Config
 from scripts.art_relevance import operations as ops
 config = Config()
-@dg.asset
-def extract():
-    dep_path = config.get_data_path("raw.zip")
-    out_path = config.get_data_path("raw.article_text")
-    ops.extract(dep_path, out_path)
-
-@dg.asset(deps=[extract], description="Filter using external relevance model")
-def pre_relevant():
-    dep_path = config.get_data_path("raw.article_text")
-    out_path = config.get_data_path("pre_relevance.article_text")
-    ops.pre_relevant(dep_path, out_path)
+@dg.asset(deps=[extract], description="Split labeled data for training.")
+def split_train_test():
+    in_path = config.get_data_path("art_relevance.article_text_labeled")
+    out_path_train = config.get_data_path("art_relevance.article_text_train")
+    out_path_test = config.get_data_path("art_relevance.article_text_test")
+    ops.split_train_test(in_path, out_path_train, out_path_test)
 ```
 
-This way the processing functions (ops) can be arbitrarily complicated, but
-`assets.py` makes it very clear how they should be chained.
+This may look like boilerplate, but I like it's cleanliness. The logical separation
+makes it very clear that `assets.py` is about defining *arbitrarily complicated **Dagster***
+dependencies, whereas `operations.py` is about defining *arbitrarily complicated **data manipulation***.
 
-## Training
+# Training
 
-The volunteer-contributed training data for this project addresses the 
-high-level end-to-end task. Unfortunately these data wouldn't be very helpful
-to train each sub-task model because each model sees a different conditional subset of the data.
-
-The idea is to prototype each sub-model quickly, get a sense of the overall performance,
-get a sense of which sub-units need improvement. As you saw in the dagster diagram, 
-I've inserted a "prototype_sampling" stage which picks 200 random records to
-use as a working set to develop the first model. I export these to 
-[Label Studio](https://labelstud.io/) and spend an hour annotating.
+## Annotation
+My goal is to prototype each sub-model quickly, get a sense of the overall performance,
+get a sense of which model need improvement. I sample an hour's worth of articles
+per model, and annotate them in [Label Studio](https://labelstud.io/).
 
 ![Positive example](/img/article_relevance_pos.png)
 *A positive example.*
@@ -154,39 +182,31 @@ use as a working set to develop the first model. I export these to
 ![Negative example](/img/article_relevance_neg.png)
 *A negative example.*
 
-I am using [MLFlow](https://mlflow.org/) to track model experiments. I load
+## Tuning
+I am using [MLFlow](https://mlflow.org/) to track model experiments and
+[Optuna](https://optuna.readthedocs.io/) for hyperparameter tuning. I load
 the spacy config file, flatten it like `{"nested.key.param1": val1, "nested.key.param2": val2}`
-and dump the full parameter list into MLFlow. Spacy provides a convenient function
-`spacy.util.load_config(path, overrides: dict)`
-making it easy to alter the configuration in-memory instead of writing each change
-to disk. Even though 99.9% of the values are unchanged run-to-run, 
-this way I'm never missing a baseline parameter value if I run a new experiment.
+and dump the full parameter list into MLFlow. This way I'm never missing a baseline
+parameter value if I run a new experiment, even though 99.9% of the values are unchanged run-to-run.
 
-So far I've tested limited-scope changes (ie. doesn't require different pre/post processing).
-Besides the "quickstart" model using the default spacy configs, I'm using 
-[Optuna](https://optuna.readthedocs.io/) for hyperparameter tuning. And of course
-a baseline "null_model" which simply measures the frequency of positive values 
-in the training set and predicts the positive class with that likelihood. 
+So far, hyper-parameters are not significantly altering performance. This is likely
+due to my small sample size (200-400 examples). The validation set is so tiny 
+(holding out 10%), there isn't enough variation in it for the models to predict differently.
+
+I compare the classification models to a "null model": randomly predict the positive class
+according to the frequency of positive values in the training set.
 
 ![MLFlow logs](/img/mlflow_art_relevance.png)
 
-At this point, with only 160 training
-and 20 dev examples, there isn't enough variation in the data itself for the
-hyperparameters to impact the model's performance.
+## Downstream Models
 
-# Next Steps - Sentence Classifier
+In production, the sentence classifier will only see sentences from articles which the 
+article classifier has labeled as "crime-related". In other words, its data 
+distribution is conditional on the article classifier. To mirror this aspect
+during training, I take an independent sample from the raw data
+and pass it through the article classifier to filter relevant articles. I pre-process
+the article text, including breaking it into sentences. And annotate the sentences
+by hand in Label Studio.
 
-I will pull a new set of a few hundred articles, filter them through the
-article-classifier prototype, and use the "relevant" articles to train the next task.
-With this prototype 29% of the articles it passes to the next stage will be irrelevant, meaning more
-wasted time in Label Studio. 
+![Conditional data flow](/img/sentence_relevance.png)
 
-Many articles (e.g. sports) use violence-laden language to describe non-criminal acts. These cases will
-likely confuse the model at the sentence-level, which is why I attempted filtering at the
-article-level. Hopefully these cases will not severely degrade the sentence-level
-model too much.
-
-On the bright side, this prototype is an improvement over the externally labeled
-`pre_relevance` stage, which had a precision of 36%. Since the next model is also
-a text classifier, I can re-use a lot of the pipeline and training aparatus from
-this stage.
