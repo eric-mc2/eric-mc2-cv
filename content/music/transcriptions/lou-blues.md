@@ -1,9 +1,10 @@
 ---
 title: "Lou Blues"
 featured: true
-description: "Text used in summary on main page"
-image: ""
-draft: true
+description: "Clifford Brown"
+image: "lou-blues.jpg"
+draft: false
+renderSingle: false
 sitemap:
   priority : 0.8
 ---

@@ -1,0 +1,29 @@
+{{ define "main" }}
+<section class="resume-section p-3 p-lg-5 d-flex flex-column">
+  <div class="my-auto" id="music-content">
+    <h1 id="{{ urlize .Title }}">{{ .Title }}</h1>
+    <p>{{ .Content }}</p>
+    
+    {{ $sections := slice "song-cuts" "transcriptions" }}
+    {{ $site := .Site }}
+    {{ range $sections }}
+      {{ $sectionName := . }}
+      {{ with $site.GetPage "section" (printf "music/%s" .) }}
+        <div class="section-container mb-5">
+          <h2 id="{{ urlize .Title }}">{{ .Title }}</h2>
+          <p>{{ .Content }}</p>
+          {{ range .Pages }}
+            {{ if eq $sectionName "transcriptions" }}
+              {{ partial "music/transcriptionsSummary" . }}
+            {{ else if eq $sectionName "song-cuts" }}
+              {{ partial "music/song-cutsSummary" . }}
+            {{ else }}
+              {{ partial "sectionSummary" . }}
+            {{ end }}
+          {{ end }}
+        </div>
+      {{ end }}
+    {{ end }}
+  </div>
+</section>
+{{ end }}

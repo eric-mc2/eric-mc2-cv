@@ -1,8 +1,25 @@
-<div class="summary-item d-flex flex-column flex-md-row mb-5">
-    <div class="publication-content mr-auto pe-4">  <!-- Added pe-4 for padding -->
-        <div>{{ .Params.description | safeHTML }}</div>
+<div class="resume-item d-flex flex-column flex-md-row mb-5">
+  <div class="resume-content mr-auto pe-4">
+    <h3 class="mb-0">{{ .Params.Title }}</a></h3>
+    <div class="subheading mb-3">{{ .Params.description | safeHTML }}</div>
+    {{ if .Params.image }}
+    <div class="row">
+      <!-- Original image display -->
+      <div class="col-md-6">
+        <div class="image-container summary-img text-md-right">
+          <img src="/img/{{ .Params.image }}" alt="{{ .Params.Title }}" class="img-fluid transcription-image">
+          <p class="image-caption text-center">Original Display</p>
+        </div>
+      </div>
+      <!-- Render-image shortcode display -->
+      <div class="col-md-6">
+        <div class="image-container summary-img text-md-right">
+          {{ $imgPath := printf "/img/%s" .Params.image }}
+          {{ partial "render-image.html" (dict "Destination" $imgPath "Text" .Params.Title "Page" . "Title" .Params.Title) }}
+          <p class="image-caption text-center">Render-Image Shortcode</p>
+        </div>
+      </div>
     </div>
-    <div class="summary-img text-md-right">
-        <img src="{{ .Params.image }}"/>
-    </div>
+    {{ end }}
+  </div>
 </div>
