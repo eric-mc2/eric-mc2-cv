@@ -1,25 +1,29 @@
 <div class="resume-item d-flex flex-column flex-md-row mb-5">
-  <div class="resume-content mr-auto pe-4">
-    <h3 class="mb-0">{{ .Params.Title }}</a></h3>
-    <div class="subheading mb-3">{{ .Params.description | safeHTML }}</div>
-    {{ if .Params.image }}
-    <div class="row">
-      <!-- Original image display -->
+  <div class="resume-content w-100">
+      
+    <div class="row align-items-center">
       <div class="col-md-6">
-        <div class="image-container summary-img text-md-right">
-          <img src="/img/{{ .Params.image }}" alt="{{ .Params.Title }}" class="img-fluid transcription-image">
-          <p class="image-caption text-center">Original Display</p>
-        </div>
+          <h3 class="mb-0">{{ .Params.Title }}</h3>
+          <div class="subheading mb-3">Artist: {{ .Params.artist}}</div>
+          <div class="subheading mb-3">Album: {{ .Params.album}}</div>
+          {{ if .Params.youtube }}
+          <div class="youtube-embed" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+              <iframe src="https://www.youtube.com/embed/{{ .Params.youtube }}{{ if .Params.start }}?start={{ .Params.start }}{{ if .Params.end }}&end={{ .Params.end }}{{ end }}{{ end }}&controls=0" 
+                      loading="lazy" 
+                      title="Source Recording" 
+                      frameborder="0"
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowfullscreen="false"></iframe>
+          </div>
+          {{ end }}
       </div>
-      <!-- Render-image shortcode display -->
-      <div class="col-md-6">
-        <div class="image-container summary-img text-md-right">
-          {{ $imgPath := printf "/img/%s" .Params.image }}
-          {{ partial "render-image.html" (dict "Destination" $imgPath "Text" .Params.Title "Page" . "Title" .Params.Title) }}
-          <p class="image-caption text-center">Render-Image Shortcode</p>
+      <div class="col-md-6 text-md-end">
+        <div class="image-container summary-img">
+          <img src="/img/{{ .Params.image }}" alt="{{ .Params.Title }}" class="img-fluid transcription-image" style="max-width: 100%; height: auto;">
         </div>
       </div>
     </div>
-    {{ end }}
+
   </div>
 </div>

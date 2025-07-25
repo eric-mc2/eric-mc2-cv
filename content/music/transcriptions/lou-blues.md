@@ -1,10 +1,13 @@
 ---
-title: "Lou Blues"
+title: "Lou's Blues"
 featured: true
-description: "Clifford Brown"
+artist: "Clifford Brown"
+album: "Brownie Speaks"
 image: "lou-blues.jpg"
+youtube: "JYnwYcYbLLw"
+start: 77
+end: 117
 draft: false
 renderSingle: false
-sitemap:
-  priority : 0.8
+order: 1
 ---
