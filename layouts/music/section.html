@@ -21,8 +21,8 @@
       </div>
     {{ end }}
     
-    <!-- If there are any direct pages under this section (not in subsections) -->
-    {{ if gt (len .Pages) 0 }}
+    <!-- Only show direct content when we're in a subsection, not on the main music page -->
+    {{ if and (gt (len .Pages) 0) (ne .RelPermalink "/music/") }}
       <div class="music-direct-content">
         {{ range (.Pages.ByParam "order") }}
           {{ if eq (path.Base .CurrentSection.RelPermalink) "transcriptions" }}
