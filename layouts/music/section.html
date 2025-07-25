@@ -3,18 +3,28 @@
   <div class="mt-2" id="music-content">
     <h1 id="{{ urlize .Title }}">{{ .Title }}</h1>
     <p>{{ .Content }}</p>
-    {{ if eq .Section "music" }}
+    
+    <!-- First loop over sections (transcriptions/song-cuts) -->
+    {{ range .Sections }}
+      <div class="music-section">
+        <h2 id="{{ urlize .Title }}">{{ .Title }}</h2>
+        <p>{{ .Content }}</p>
+        
+        <!-- Second loop over each piece of content within the section -->
         {{ range (.Pages.ByParam "order") }}
           {{ partial "musicSummary" . }}
         {{ end }}
-    {{ else }}
-      {{ range .Sections }}
-        <h2 id="{{ urlize .Title }}">{{ .Title }}</h2>
-        <p>{{ .Content }}</p>
+      </div>
+    {{ end }}
+    
+    <!-- If there are any direct pages under this section (not in subsections) -->
+    {{ if gt (len .Pages) 0 }}
+      <div class="music-direct-content">
+        <h3>Other Content</h3>
         {{ range (.Pages.ByParam "order") }}
-            {{ partial "musicSummary" . }}
+          {{ partial "musicSummary" . }}
         {{ end }}
-      {{ end }}
+      </div>
     {{ end }}
   </div>
 </section>
