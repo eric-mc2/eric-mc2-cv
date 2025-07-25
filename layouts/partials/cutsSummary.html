@@ -1,0 +1,30 @@
+<div class="resume-item d-flex flex-column flex-md-row mb-5">
+  <div class="resume-content w-100">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+          <h2 class="mb-0">{{ .Params.Title }}</h2>
+          <div class="subheading mb-3">Artist: {{ .Params.artist}} -- For: {{ .Params.team}}</div>
+          <div class="subheading mb-3">Cut Version:</div>
+          {{ if .Params.audio }}
+          <audio controls preload="auto" style="width: 100%; margin-bottom: 15px;">
+            <source src="/audio/{{ .Params.audio }}">
+          </audio>
+          {{ end }}
+          {{ if .Params.spotify }}
+          <div class="subheading mb-3">Original:</div>
+          <div class="spotify-embed" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+              <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+              src="https://open.spotify.com/embed/track/{{ .Params.spotify }}?utm_source=generator" 
+              width="100%" 
+              height="152" 
+              frameBorder="0" 
+              allowfullscreen="" 
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+              loading="lazy">
+            </iframe>
+          </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,7 @@ draft: false
 
 Hi! I transcribe music by ear and I'm damn good at it. Check out some of my past work.
 
-I also mix and cut songs for dance performance (especially salsa):
+I also mix and cut songs for dance performance (especially salsa). My cuts are:
 
 - *imperceptible:* you'll think it's the original version
 - *dynamic*: I create an emotional arc to inspire your choreography
