@@ -9,6 +9,7 @@ enableGitInfo = false
 googleAnalytics = "G-3XT6HHHNVY"
 
 [params]
+debugTemplateLookup = true
 address = "Chicago, IL"
 email = ""
 favicon = "img/favicon.png"
@@ -31,6 +32,10 @@ name = "LinkedIn"
 [[params.handles]]
 link = "https://github.com/eric-mc2/"
 name = "GitHub"
+
+[[params.musicHandles]]
+link = "https://instagram.com/emc2.music/"
+name = "Instagram"
 
 [outputs]
 home = ["HTML", "JSON"]

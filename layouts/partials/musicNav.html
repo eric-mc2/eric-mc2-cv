@@ -4,7 +4,13 @@
       <span class="d-none d-lg-block">
         <img class="img-fluid img-profile mx-auto w-100" style="max-width: 90%;" src="{{ .Site.Params.musicProfileImage | relURL }}" alt="">
       </span>
-    </a>
+  </a>
+  <!-- Add navbar toggler button for mobile -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" 
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -13,7 +19,21 @@
       <li class="nav-item">
           <a class="nav-link js-scroll-trigger" href="/music#transcriptions">Transcriptions</a>
       </li>
+      
+      <!-- Move social icons inside the collapsible content -->
+      <ul class="list-inline list-social-icons mb-0 mt-4">
+          {{ range .Site.Params.musicHandles }}
+          <li class="list-inline-item">
+              <a href="{{ .link }}" data-toggle="tooltip" title="{{ .name }}" data-offset="0,10" rel="me">
+                  <span class="fa-stack fa-lg">
+                      <i class="fa fa-circle fa-stack-2x"></i>
+                      <i class="fab {{ if .icon}}fa-{{ .icon }}{{ else }}fa-{{ lower .name }}{{ end }} fa-stack-1x fa-inverse"></i>
+                  </span>
+              </a>
+          </li>
+          {{ end }}
+      </ul>
     </ul>
-  </div>
+    </div>
 </nav>
 

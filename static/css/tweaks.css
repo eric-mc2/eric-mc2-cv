@@ -154,5 +154,27 @@ img[src*="scaledown"] {
     margin-left: auto;
     margin-right: auto;
     display: block
+}
 
+/* Responsive styling for music title headers */
+h1.music-title {
+    font-size: 4rem;
+    line-height: 3.5rem;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Media query for larger screens */
+@media (min-width: 768px) {
+    h1.music-title {
+        font-size: 5.5rem;
+        line-height: 5rem;
+    }
+}
+
+@media (min-width: 992px) {
+    h1.music-title {
+        font-size: 6rem;
+        line-height: 5.5rem;
+    }
 }
