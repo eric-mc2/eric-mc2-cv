@@ -1,0 +1,8 @@
+<div class="summary-item d-flex flex-column flex-md-row mb-5">
+    <div class="publication-content mr-auto pe-4">  <!-- Added pe-4 for padding -->
+        <div>{{ .Params.description | safeHTML }}</div>
+    </div>
+    <div class="summary-img text-md-right">
+        <img src="{{ .Params.image }}"/>
+    </div>
+</div>

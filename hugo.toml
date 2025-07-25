@@ -16,6 +16,7 @@ firstName = "Eric"
 lastName = "Chandler"
 phone = "123-456-7890"
 profileImage = "img/headshot.png"
+musicProfileImage = "img/line-drawing.jpg"
 showQr = false
 showContact = false
 showSocializations = true

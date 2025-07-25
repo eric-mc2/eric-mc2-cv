@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  {{ partial "head-common.html" . }}
+  <title>{{ .Site.Title }} Music | {{ .Title }}</title>
+
+  <meta name="author" content="{{ .Site.Params.firstName }} {{ .Site.Params.lastName }}">
+  <meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{else}}{{ .Description }}{{ end }}">
+</head>
+<body>
+  {{ partial "musicNav.html" . }}
+
+  <div class="container-fluid p-0" style="margin-left:220px;">
+    {{ block "main" . }}{{ end }}
+  </div>
+  
+  {{ partial "scripts-common.html" . }}
+</body>
+</html>
