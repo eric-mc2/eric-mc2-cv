@@ -1,0 +1,25 @@
+{{ if .Site.Params.mediumZoom }}
+
+    {{ with resources.Get "js/medium-zoom.min.js" | fingerprint }}
+        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous"></script>
+    {{ end }}
+
+    <style>
+    .medium-zoom-overlay,
+    .medium-zoom-image--opened {
+        z-index: 999;
+    }
+    </style>
+
+    <script>
+        initZoom = function() {
+            mediumZoom('.zoomable [data-zoomable]');
+        }
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initZoom);
+        } else {
+            initZoom();
+        }
+    </script>
+
+{{ end }}

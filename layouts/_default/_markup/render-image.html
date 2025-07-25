@@ -1,8 +1,16 @@
 {{ if .Title }}
   <figure>
-    <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}">
+    {{ if .Page.Site.Params.mediumZoom }}
+      <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" data-zoomable data-zoom-src="{{ .Destination | safeURL }}">
+    {{ else }}
+      <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}">
+    {{ end }}
     <figcaption>{{ printf "Fig: %s" .Title }}</figcaption>
   </figure>
 {{ else }}
-  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}">
+  {{ if .Page.Site.Params.mediumZoom }}
+      <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" data-zoomable data-zoom-src="{{ .Destination | safeURL }}">
+    {{ else }}
+      <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}">
+    {{ end }}
 {{ end }}
