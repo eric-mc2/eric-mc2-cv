@@ -8,7 +8,7 @@
           <div class="subheading mb-3">Album: {{ .Params.album}}</div>
           {{ if .Params.youtube }}
           <div class="youtube-embed" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
-              <iframe src="https://www.youtube.com/embed/{{ .Params.youtube }}{{ if .Params.start }}?start={{ .Params.start }}{{ if .Params.end }}&end={{ .Params.end }}{{ end }}{{ end }}&controls=0" 
+              <iframe src="https://www.youtube.com/embed/{{ .Params.youtube }}?{{ if .Params.start }}start={{ .Params.start }}{{ if .Params.end }}&end={{ .Params.end }}{{ end }}{{ end }}&controls=0" 
                       loading="lazy" 
                       title="Source Recording" 
                       frameborder="0"

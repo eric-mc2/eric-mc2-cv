@@ -11,12 +11,6 @@
 	    {{ with .Params.link }}
 	    	<p>Project link: <a href="{{ . }}">{{ . }}</a></p>{{ end }}
 	</div>
-    <div>
-    	{{ with $.Page.Resources.GetMatch "gpx" }}
-		    <a href="{{ .Permalink }}" title="Click to download gpx file">GPX file</a>
-		{{ end }}
-    </div>
-    {{ partial "advtags" . }}
   </div>
 </section>
 {{ end }}

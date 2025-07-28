@@ -9,6 +9,7 @@
 
   <meta name="author" content="{{ .Site.Params.firstName }} {{ .Site.Params.lastName }}">
   <meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{else}}{{ .Description }}{{ end }}">
+  {{ template "_internal/google_analytics.html" . }}
 </head>
 <body>
   {{ partial "musicNav.html" . }}
