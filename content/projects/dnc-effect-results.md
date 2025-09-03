@@ -4,7 +4,7 @@ date: 2025-01-08T10:47:51-06:00
 featured: true
 description: "Presenting the regression results"
 tags: ["data science", "econometrics", "panel data"]
-image: ""
+image: "/img/parallel_trends.jpeg"
 pubtype: "Model"
 link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500

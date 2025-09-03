@@ -4,7 +4,7 @@ date: 2025-03-18T10:34:18-05:00
 featured: true
 description: "Extracting reported crime locations from news articles"
 tags: ["crime","media analysis","nlp"]
-image: ""
+image: "/img/qjn-pipeline.png"
 link: "https://github.com/eric-mc2/quantify-justice-news-geos/"
 weight: 500
 pubtype: "Dataset"

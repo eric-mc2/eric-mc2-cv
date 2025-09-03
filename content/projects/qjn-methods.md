@@ -4,7 +4,7 @@ date: 2025-04-14T16:29:12-05:00
 featured: true
 description: "text analysis implementation"
 tags: ["machine learning","data engineering","spacy","nlp","dagster","mlflow","GIS"]
-image: ""
+image: "/img/article_relevance_combined.png"
 link: "https://github.com/eric-mc2/quantify-justice-news-geos/"
 weight: 500
 pubtype: "Model"

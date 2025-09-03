@@ -5,7 +5,7 @@ featured: true
 pubtype: Data Viz
 description: "Dashboard of student achievement and community indicators"
 tags: ["data science", "data visualization", "storytelling", "dashboard", "Observable Framework", "javascript"]
-image: ""
+image: "/img/staar-demo.gif"
 link: "https://github.com/eric-mc2/reading-scores-demo"
 weight: 500
 sitemap:

@@ -4,7 +4,7 @@ date: 2024-11-19T10:47:51-06:00
 featured: true
 description: "A half-serious econometric model"
 tags: ["data science", "econometrics", "panel data"]
-image: ""
+image: "/img/panel_sample.jpeg"
 pubtype: "Model"
 link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500

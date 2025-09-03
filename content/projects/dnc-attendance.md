@@ -4,7 +4,7 @@ date: 2025-02-01T10:47:51-06:00
 featured: true
 description: "Navigating the challenges of selection bias"
 tags: ["data science", "econometrics", "panel data"]
-image: ""
+image: "/img/attendance_timeline.jpeg"
 pubtype: "Model"
 link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500

@@ -5,7 +5,7 @@ featured: true
 pubtype: Data Viz
 description: "Network visualization of 527 political contributions"
 tags: ["data science", "money in politics", "d3", "typescript"]
-image: ""
+image: "/uploads/527-explorer.gif"
 link: "https://github.com/eric-mc2/527-explorer"
 weight: 500
 sitemap:

@@ -5,7 +5,7 @@ featured: true
 pubtype: Dataset
 description: "Collecting a time series dataset for urban policy"
 tags: ["data science","open data", "urban science", "Socrata", "Amazon S3", "geopandas"]
-image: ""
+image: "/img/bus-routes-screenshot.png"
 link: "https://github.com/eric-mc2/DNCTransit"
 leaflet: true
 weight: 500
