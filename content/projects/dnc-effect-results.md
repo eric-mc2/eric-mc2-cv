@@ -10,6 +10,7 @@ link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500
 math: true
 plotly: true
+draft: true
 sitemap:
   priority : 0.8
 ---
@@ -49,6 +50,8 @@ speaks to city-wide effects during the DNC.
 
 With this major caveat in mind, let's run the model (separate models per transit mode[^1]):
 
+[//]: # (TODO: Need to recompute this.)
+
 {{< import-md-table file="static/uploads/fe.md" >}}
 
 The results show a -5.1%, -7.8%, and +3.0% percentage point change in uber, train, and bike ridership
@@ -86,6 +89,8 @@ $$ \log{rides_{it}} \sim \beta_0 + \beta_1 \text{DNC}_t + \beta_2 \text{nearby}_
     \beta_3 \text{DNC}_t \text{nearby}_i + 
     X_{it} + u_{it} $$
 
+[//]: # (TODO: Need to double check markdown vs prose numbers.)
+
 {{< import-md-table file="static/uploads/did.md" >}}
 
 These results show a baseline difference in transit usage between convention 
@@ -108,6 +113,15 @@ in the long-term and even show similar patterns on a weekly scale.
 We also don't see any anticipatory effects leading up to the DNC event.
 
 ![Parallel trends assumption](/img/parallel_trends.jpeg "Parallel trends assumption.")
+
+### Placebo Test
+
+As a robustness check, I shift the simulated treatment period back across 8 x 4-day windows.
+38% of the simulated models returned statistically significant main effects,
+but the actual DNC effects (x's) were much larger than the simulated effects (box & whisker).
+
+![Placebo Test](/img/placebo_stadium.jpeg "Placebo Test.")
+
 
 # Conclusion
 

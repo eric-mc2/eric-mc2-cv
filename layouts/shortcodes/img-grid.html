@@ -1,0 +1,10 @@
+{{ $cols := .Get "cols" | default "3" }}
+{{ $width := .Get "width" | default "100%" }}
+{{ $images := split (.Get "images") "," }}
+
+<div style="display:grid; grid-template-columns: repeat({{ $cols }}, minmax(0, 1fr)); gap: 0.5rem; margin: 2.5rem auto 0; max-width: 60rem;">
+  {{ range $images }}
+    {{ $path := . | plainify | safeHTML }}
+    <img src="{{ $path }}" style="width:{{ $width }}; height:auto; display:block;">
+  {{ end }}
+</div>

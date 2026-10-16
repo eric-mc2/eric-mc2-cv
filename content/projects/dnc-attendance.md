@@ -10,6 +10,7 @@ link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500
 math: true
 plotly: true
+draft: true
 sitemap:
   priority : 0.8
 ---
@@ -148,6 +149,8 @@ $$ \log{rides_{it}} \sim \beta_0 + \beta_1 \text{DNC}_t + \beta_2 \text{near DNC
     \beta_3 \text{DNC}_t \text{near DNC}_i +
     X_{it} + u_{it} $$
 
+[//]: # (TODO: I think I need to re-compute this model.)
+
 {{< import-md-table file="static/uploads/did-stadium.md" >}}
 
 In the control group we observe a (non-causal)
@@ -156,6 +159,8 @@ rides, which agrees directionally with the un-subsetted data. The
 causal effect of the DNC on rideshares, train, and bike rides 
 near the DNC is a +31.6%, +145.5% (NS), and +56.7% percentage-point change,
 an increase in magnitude.
+
+## Placebo Test
 
 As a robustness check on this model, I plot the parallel trends and run a placebo 
 test, shifting the simulated treatment period back across 8 x 4-day windows.

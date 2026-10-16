@@ -10,6 +10,7 @@ link: "https://github.com/eric-mc2/DNCTransit"
 weight: 500
 math: true
 plotly: true
+draft: true
 sitemap:
   priority : 0.8
 ---
@@ -263,6 +264,8 @@ delegates take transit, this regression design should be able to detect an effec
 **Selection Balance**
 
 Here is a balance table for the three separate transit modes:
+
+[//]: # (TODO: Need to double check markdown vs prose numbers.)
 
 {{< import-md-table file="static/uploads/balance.md" >}}
 

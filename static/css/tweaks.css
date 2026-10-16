@@ -178,3 +178,27 @@ h1.music-title {
         line-height: 5.5rem;
     }
 }
+
+.centered-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem auto;
+  text-align: center;
+}
+
+.centered-image img {
+  width: var(--img-width, 60%);
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+
+.centered-image figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
