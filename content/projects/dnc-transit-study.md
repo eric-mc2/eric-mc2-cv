@@ -27,7 +27,7 @@ This project aims to measure the partial economic impact of the 2024 Chicago Dem
 opportunities for job creation" to constituents [^1], and raise the profile of a city on the national and global stage. 
 Balancing these promises, events face local pushback for expropriating public spaces for long periods and 
 to deliver meaningful engagement with local economies. What incentives a city should offer a major corporation, 
-such as Amazon[^5] or the Bears, for a more permanent investment are a related, and under-studied thread.
+such as Amazon[^2] or the Bears, for a more permanent investment are a related, and under-studied thread.
 
 {{< img-grid cols="2" width="50%" images="/img/olympics.jpg,/img/nascar.jpg" >}}
 
@@ -41,9 +41,9 @@ while city-wide residents expected backups along I-290 and leading to the I-90 /
 {{< imgresize src="/img/dnc_security_map.webp" alt="Security Perimeter" width="50%" />}}
 
 Chicago's voting history as a Democratic stronghold and its location among Midwestern battleground states
-were cited as primary factors to enter and win its convention bid[^2]. 
+were cited as primary factors to enter and win its convention bid[^3]. 
 Other cities under consideration included Atlanta, Houston and New York City.
-Chicago's hospitality sector, public transportation, venue capacity, and logistics also gave it an edge up[^3]. 
+Chicago's hospitality sector, public transportation, venue capacity, and logistics also gave it an edge up[^4]. 
 With President Biden still seeking re-election at the time of the decision, his achievement with the
 Bipartisan Infrastructure Law was also at the top of the conversation and political platform for the upcoming election.
 
@@ -55,7 +55,7 @@ environmental sustainability analysis.
 
 > **Does the exogeneous shock of the 2024 Democratic National Convention in Chicago significantly impact mobility?**
 
-A secondary goal of this project was to experientially[^8] learn about statistical modeling in a policy setting. By design,
+A secondary goal of this project was to experientially[^6] learn about statistical modeling in a policy setting. By design,
 this experiment is a win-win. If a significant result is found, that's interesting. If no significant result is found,
 that could be interesting too, especially results like "DNC touts green infrastructure, favors Ubers to convention".
 Finally, if the experiment or data is insufficient, that's a learning opportunity to 
@@ -75,7 +75,7 @@ to daily station (bike dock) counts of trip start-points and endpoints. Uber dat
 rows, including exact start and end times and coded by census tract. I aggregated this data to daily tract counts
 of start-points and endpoints. To retain a fuller picture of transit patterns, I kept and consolidated start and end points
 so that all transit modes describe daily rides visiting an area. The train data is comparatively under-counted in this setup.
-For modeling, I kept each transit mode in its natural geometry (fixed train station points, fixed bike dock points, uber census tracts).[^6]
+For modeling, I kept each transit mode in its natural geometry (fixed train station points, fixed bike dock points, uber census tracts).[^7]
 
 | **Modality**          | **Included/Excluded** | **Challenges**                          |
 |-----------------------|-------------------|-----------------------------------------|
@@ -148,7 +148,7 @@ $$\log y_{it} = \beta_1 D_{it} + \beta_2 D_{it} M_i + \alpha_i + \gamma' t M_i +
 where \(y_{it}\) are the number of rides, \(D_{it}\) is the treatment indicator for unit i at time t,
 \(M_i\) indicates the transit mode, \(\alpha_i\) are unit fixed effects, \(\gamma' t M_i\) are time fixed
 effects interacted with transit mode, and \(\epsilon_{it}\) is the idiosyncratic error term. Standard 
-errors are clustered two ways per unit and per timestep[^7].
+errors are clustered two ways per unit and per timestep[^8].
 
 Conceptually, diff-in-diff models proceed in three stages. First, the model measures how the control group changes over time.
 Second, the model measures how the treatment group changes over time. Third, it compares the two group's changes. 
@@ -193,7 +193,8 @@ shocks to traffic during the event.
 
 ## Model Specifications
 
-I run a battery of alternative model specifications and sub-samples of the data to test potential confounders.
+I run a battery of alternative specifications by changing the model, 
+the control group composition, the treatment group composition, and omitting potential confounders.
 
 1. The main model (Eq 1).
 2. A more parsimonious fixed effect structure, keeping only the non-interacted unit and time components (Eq 2).
@@ -201,11 +202,17 @@ I run a battery of alternative model specifications and sub-samples of the data 
 4. The sample from (3), using the model specification from Eq 2.
 5. Sub-samples the panel to only include units within 1 mile of the United Center, McCormick Place, Wrigley Field, Soldier Field, and Rate Field.
 6. The sample from (5), using the model specification from Eq 2.
+7. Only census tracts that lay at least 50% inside venue radius are labeled as treated.
+
+TODO: I WANT TO SWITCH 7 and 1!!
 
 $$\log y_{it} = \beta_1 D_{it} + \beta_2 D_{it} M_i + \alpha_i + \delta_t + \epsilon_{it} \tag{2}$$
 
 Motivating (3), the timing of the Damen Green Line stop's re-opening, one week before the DNC, is a likely confounder. Unfortunately the Damen stop is also the closest stop to the United Center.
-Motivating (5), the DNC venue areas are likely dissimilar to Chicago in general. By restricting the sample to other major sporting venues, the control group is more apt. 
+Motivating (5), the DNC venue areas are likely dissimilar to Chicago in general. By restricting the sample to other major sporting venues, the control group is more apt.
+Motivating (7), this gathers more units into the treatment group, increasing precision but risking identification by including
+barely intersected tracts (for reference, only 3 tracts are 100% contained in the venue radius). Both (1) and (7) 
+ecologically assume a homogeneous rider distribution within spatial units. 
 
 {{< import-html-table file="static/uploads/did_battery.html" >}}
 
@@ -217,15 +224,12 @@ for all models except (6).
 
 ## Placebo Test
 
-TODO: START HERE. KEEP WRITING
+For a final robustness check, I re-run the main specification (1), 
+marking each pre-treatment week as a virtual treatment period.
+The placebo estimates are markedly closer to zero than the main effect, and none are larger in absolute value
+than the main effect.
 
-I tested 8 virtual treatment windows prior to the actual DNC event. The 
-actual DNC effects were much larger than the virtual periods.
-
-I should pick the model I like best for the placebo test.
-
-<img src="./img/placebo_stadium.jpeg" width="400" />
-
+{{< import-html-table file="static/uploads/placebo_study.html" >}}
 
 # Discussion
 
@@ -236,13 +240,12 @@ However. The parallel trends test, placebo test, and alternate specifications al
 validity of the results.
 
 [^1]: https://democrats.org/news/dnc-announces-chicago-to-host-2024-democratic-national-convention/
-[^2]: https://www.duckworth.senate.gov/news/in-the-news/how-chicago-landed-the-2024-democratic-national-convention
-[^3]: https://www.nytimes.com/2023/04/11/us/politics/democratic-national-convention-chicago.html
-[^4]: Train ridership numbers only count trip starting points. Rideshare and bikeshare ridership count both starting and ending points. 
-[^5]: https://www.buzzfeednews.com/article/leticiamiranda/amazon-hq2-finalist-cities-incentives-airport-lounge
-[^6]: I describe the panel data preparation in more detail [here](../transit-panel/index.html). 
-[^7]: I test variations of this model in the [robustness](#Robustness-Checks) section.
-[^8]: Code available on my [github](https://github.com/eric-mc2/DNCTransit).
+[^2]: https://www.buzzfeednews.com/article/leticiamiranda/amazon-hq2-finalist-cities-incentives-airport-lounge
+[^3]: https://www.duckworth.senate.gov/news/in-the-news/how-chicago-landed-the-2024-democratic-national-convention
+[^4]: https://www.nytimes.com/2023/04/11/us/politics/democratic-national-convention-chicago.html
+[^6]: Code available on my [github](https://github.com/eric-mc2/DNCTransit).
+[^7]: I describe the panel data preparation in more detail [here](../transit-panel/index.html). 
+[^8]: I test variations of this model in the [robustness](#Robustness-Checks) section.
 
 <!--
 I should do an expanded model with 1 day extra.
@@ -251,8 +254,3 @@ Should I add spatial weights? Wouldn't be too hard. It basically models a partia
 
 Should I do a sensitivity analysis or code treatment as gaussian of distance from centroid to DNC?
 -->
-
-# Conclusion
-
-Um I ran a model. It has these results. I doesn't address these things. It has these limitations.
-Don't over-state reasons they shouldn't trust you. 
