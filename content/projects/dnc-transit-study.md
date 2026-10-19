@@ -17,7 +17,7 @@ sitemap:
 
 Chicago hosted the 2024 Democratic National Convention from August 19-22, with official events primarily at the United Center
 and McCormick Place. Over those four days, 64,000 train rides, 148,000 rideshares, and 10,000 bikeshares occurred
-in proximity to the venues, of which **22,000 train rides, 31,000 rideshares, and 3,000 bikeshares** 
+in proximity to the venues, of which **22,000 train rides, 41,000 rideshares, and 3,000 bikeshares** 
 can be attributed to the convention. There is no evidence that convention-goers preferred any transit mode at different
 rates than baseline commuters.
 
@@ -55,7 +55,7 @@ environmental sustainability analysis.
 
 > **Does the exogeneous shock of the 2024 Democratic National Convention in Chicago significantly impact mobility?**
 
-A secondary goal of this project was to experientially[^6] learn about statistical modeling in a policy setting. By design,
+A secondary goal of this project was to experientially[^5] learn about statistical modeling in a policy setting. By design,
 this experiment is a win-win. If a significant result is found, that's interesting. If no significant result is found,
 that could be interesting too, especially results like "DNC touts green infrastructure, favors Ubers to convention".
 Finally, if the experiment or data is insufficient, that's a learning opportunity to 
@@ -75,17 +75,9 @@ to daily station (bike dock) counts of trip start-points and endpoints. Uber dat
 rows, including exact start and end times and coded by census tract. I aggregated this data to daily tract counts
 of start-points and endpoints. To retain a fuller picture of transit patterns, I kept and consolidated start and end points
 so that all transit modes describe daily rides visiting an area. The train data is comparatively under-counted in this setup.
-For modeling, I kept each transit mode in its natural geometry (fixed train station points, fixed bike dock points, uber census tracts).[^7]
+For modeling, I kept each transit mode in its natural geometry (fixed train station points, fixed bike dock points, uber census tracts).[^6]
 
-| **Modality**          | **Included/Excluded** | **Challenges**                          |
-|-----------------------|-------------------|-----------------------------------------|
-| Train                 | x                 | easy (Socrata API / sodapy)             |
-| Uber/Lyft             | x                 | medium (300M rows; query optimization)  |
-| Divvy (bikes)         | x                 | hard (gps drift; unstable ids)          |
-| Bus                   |                   | too coarse                              |
-| Metra (commuter rail) |                   | too coarse                              |
-| Walking / Biking      |                   | vendored/unavailable                    |
-| Driving               |                   | vendored/unavailable                    |
+{{< import-md-table file="/static/uploads/data_sources.md" >}}
 
 Geographic data came from:
 
@@ -98,13 +90,13 @@ Geographic data came from:
 
 The panel constitutes the DNC dates (August 18 - 21), plus three months' prior, capturing baseline summertime transit patterns.
 I compute the distance of each transit stop and tract centroid to the United Center and McCormick Place buildings.
-Any point within a mile of the building or any tract !!TODO!! is considered part of the treatment group. All other
+Any point within a mile of the building or any tract at least 50% within the mile buffer is considered part of the treatment group. All other
 train stations, bike docks, and census tracts within the Chicago city limits are considered part of the control group.
 
 {{< imgresize src="/img/perimeters.png" alt="Sample" width="75%" >}}
 Left-to-right close-ups of train, bike, and uber treatment area. 
-Red = treatment group, black = control group. 
-Blue = DNC security perimeter and 1 mile buffer. 
+Blue = DNC security perimeter and 1 mile buffer. <BR> 
+Red = treatment group. Black = control group. Gray = marginal tracts.
 {{< /imgresize >}}
 
 {{< import-html-table file="static/uploads/balance.html" >}}
@@ -148,7 +140,7 @@ $$\log y_{it} = \beta_1 D_{it} + \beta_2 D_{it} M_i + \alpha_i + \gamma' t M_i +
 where \(y_{it}\) are the number of rides, \(D_{it}\) is the treatment indicator for unit i at time t,
 \(M_i\) indicates the transit mode, \(\alpha_i\) are unit fixed effects, \(\gamma' t M_i\) are time fixed
 effects interacted with transit mode, and \(\epsilon_{it}\) is the idiosyncratic error term. Standard 
-errors are clustered two ways per unit and per timestep[^8].
+errors are clustered two ways per unit and per timestep[^7].
 
 Conceptually, diff-in-diff models proceed in three stages. First, the model measures how the control group changes over time.
 Second, the model measures how the treatment group changes over time. Third, it compares the two group's changes. 
@@ -178,74 +170,76 @@ test in a following [section](#Robustness-Checks) of the report.
 
 ## Results
 
-The effect of the DNC on ridership was a **53%, 26%, and 32%** increase across train, Ubers, and bikeshares. Compared to
+The effect of the DNC on ridership was a **53%, 39%, and 32%** increase across train, Ubers, and bikeshares. Compared to
 each mode's own baseline, each increase is statistically significant. However, despite the point estimates being far apart,
 the estimates have a high variance so the between-mode comparison is not significant. 
 
-These percentage changes translate to an aggregate increase of **22,000 train rides, 31,000 Uber rides, and 3,000 bike rides**
+These percentage changes translate to an aggregate increase of **22,000 train rides, 41,000 Uber rides, and 3,000 bike rides**
 near DNC venues and during the event. As noted in the introduction, these are a fraction of the raw observed rides,
 or even the observed week-over-week change, because this method nets out the baseline venue traffic and any common city-wide
 shocks to traffic during the event. 
 
 {{< import-html-table file="/static/uploads/did_study.html" >}}
 
+
 # Robustness Checks
 
 ## Model Specifications
 
 I run a battery of alternative specifications by changing the model, 
-the control group composition, the treatment group composition, and omitting potential confounders.
+the control group composition, the treatment group composition, and dropping potential confounders. Regression results
+are presented in the next table.
 
 1. The main model (Eq 1).
-2. A more parsimonious fixed effect structure, keeping only the non-interacted unit and time components (Eq 2).
-3. Omits the CTA Green Line Damen stop, which was closed for construction until August 5. 
-4. The sample from (3), using the model specification from Eq 2.
-5. Sub-samples the panel to only include units within 1 mile of the United Center, McCormick Place, Wrigley Field, Soldier Field, and Rate Field.
-6. The sample from (5), using the model specification from Eq 2.
-7. Only census tracts that lay at least 50% inside venue radius are labeled as treated.
-
-TODO: I WANT TO SWITCH 7 and 1!!
+2. A more parsimonious fixed effect structure (Eq 2) that pushes transit-specific shocks into the treatment term.
+3. Drops the CTA Green Line Damen station from the panel.
+4. Label all census tracts that intersect the venue buffer as "treated".
+5. Drop all units except those within 1 mile of the United Center, McCormick Place, Wrigley Field, Soldier Field, and Rate Field.
+6. Specification 2, 3, 4, and 5 combined.
 
 $$\log y_{it} = \beta_1 D_{it} + \beta_2 D_{it} M_i + \alpha_i + \delta_t + \epsilon_{it} \tag{2}$$
 
-Motivating (3), the timing of the Damen Green Line stop's re-opening, one week before the DNC, is a likely confounder. Unfortunately the Damen stop is also the closest stop to the United Center.
-Motivating (5), the DNC venue areas are likely dissimilar to Chicago in general. By restricting the sample to other major sporting venues, the control group is more apt.
-Motivating (7), this gathers more units into the treatment group, increasing precision but risking identification by including
-barely intersected tracts (for reference, only 3 tracts are 100% contained in the venue radius). Both (1) and (7) 
-ecologically assume a homogeneous rider distribution within spatial units. 
+Motivating (3), this station re-opened on August 5 after being shuttered for 75 years. The timing of the re-opening,
+one week before the DNC, allows a short baseline estimation, but could still confound the results. This station is
+the closest stop to the United Center, so dropping it significantly attenuates the treatment effect.
+Motivating (4), the goal is to capture more relevant units and traffic that might be affected by the event, and 
+to increase the treated sample size. Traffic through these units may be unrelated to the DNC, and could affect the result
+in the positive or negative direction.On the other extremen, only 3 tracts are 100% contained in the venue radius. 
+Motivating (5), the goal is to capture a more apt control group by restricting the sample to other major sporting venues.
 
 {{< import-html-table file="static/uploads/did_battery.html" >}}
 
-All alternatives except (5) retain a statistically significant main effect (for the Uber rides reference category). 
-All alternatives also fail to reject the null hypothesis contrasting the transit modes 
-(i.e. there is no evidence that one mode was preferred over another).
-The total effect (CATE) for train remains significant for all models except (5). The total effect for bikes remains significant
-for all models except (6).
+All alternatives retain a statistically significant main effect except (6). 
+The total effect (CATE) for train remains significant for all models except (6). 
+The total effect for bikes remains significant for all models except (5).
+All alternatives retain the null result comparing transit modes.
 
 ## Placebo Test
 
-For a final robustness check, I re-run the main specification (1), 
-marking each pre-treatment week as a virtual treatment period.
-The placebo estimates are markedly closer to zero than the main effect, and none are larger in absolute value
-than the main effect.
+For a final robustness check, I re-run the main specification (1), marking each pre-treatment week as a virtual treatment period.
+The main effect exceeds each placebo estimate in absolute value and at least a 20% spread. Lending confidence to the result.
 
 {{< import-html-table file="static/uploads/placebo_study.html" >}}
 
 # Discussion
 
-These results should not be extrapolated to other cities or even other venues in Chicago. The current study is an exercise
-in precisely attributing the effects of a policy which was clearly non-random in its selection. The United Center and McCormick Place
-were selected as venues precisely for their ability to accomodate large crowds, a classic case of selection-on-the-dependent-variable. 
-However. The parallel trends test, placebo test, and alternate specifications all give credibility to the internal 
-validity of the results.
+This study estimates the causal effect of the 2024 Chicago Democratic National Convention on transit usage.
+It recovers a significant proportion of the pre-post difference in rides (e.g. week-over-week changes), 
+but takes care to rule out confounding variables that affect ridership. To do so, these methods impose a limited scope,
+and only produce a causal estimate for a small part of the city, even though the event possibly had a larger footprint.  
+
+The parallel trends test, placebo test, and alternate specifications all give credibility to the internal 
+validity of the results. The external validity is weaker since the event city and venues were specifically
+selected and designed to accomodate crowds. While accurate in attributing impacts to this specific event, 
+the results do not necessarily generalize to other cities or event spaces.
 
 [^1]: https://democrats.org/news/dnc-announces-chicago-to-host-2024-democratic-national-convention/
 [^2]: https://www.buzzfeednews.com/article/leticiamiranda/amazon-hq2-finalist-cities-incentives-airport-lounge
 [^3]: https://www.duckworth.senate.gov/news/in-the-news/how-chicago-landed-the-2024-democratic-national-convention
 [^4]: https://www.nytimes.com/2023/04/11/us/politics/democratic-national-convention-chicago.html
-[^6]: Code available on my [github](https://github.com/eric-mc2/DNCTransit).
-[^7]: I describe the panel data preparation in more detail [here](../transit-panel/index.html). 
-[^8]: I test variations of this model in the [robustness](#Robustness-Checks) section.
+[^5]: Code available on my [github](https://github.com/eric-mc2/DNCTransit).
+[^6]: I describe the panel data preparation in more detail [here](../transit-panel/index.html). 
+[^7]: I test variations of this model in the [robustness](#Robustness-Checks) section.
 
 <!--
 I should do an expanded model with 1 day extra.
