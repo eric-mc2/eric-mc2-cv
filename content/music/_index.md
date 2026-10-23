@@ -4,12 +4,9 @@ date: 2023-01-01T00:00:00-00:00
 draft: false
 ---
 
-Hi! I transcribe music by ear and I'm damn good at it. Check out some of my past work.
+Hi! I mix and cut songs for dance performance (especially salsa).
+I gained experience for this transcribing jazz solos and charts by ear. I'm damn good at both. 
 
-I also mix and cut songs for dance performance (especially salsa). My cuts are:
+In the last year, I've cut 19 pieces for 9 choreographers in the latin dance community.
 
-- *imperceptible:* you'll think it's the original version
-- *dynamic*: I create an emotional arc to inspire your choreography
-- *grounded*: all of my work preserves the tone and feel of the original artist
-
-If you want me to cut your music, DM me on instagram for rates and info!
+Check out some of my past work. And DM me on instagram for rates and info!

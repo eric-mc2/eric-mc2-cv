@@ -4,11 +4,15 @@
       <div class="col-md-6">
           <h2 class="mb-0">{{ .Params.Title }}</h2>
           <div class="subheading mb-3">Artist: {{ .Params.artist}} -- For: {{ .Params.team}}</div>
-          <div class="subheading mb-3">Cut Version:</div>
           {{ if .Params.audio }}
-          <audio controls preload="auto" style="width: 100%; margin-bottom: 15px;">
-            <source src="/audio/{{ .Params.audio }}">
-          </audio>
+            <div class="subheading mb-3">Cut Audio:</div>
+            <audio controls preload="auto" style="width: 100%; margin-bottom: 15px;">
+              <source src="/audio/{{ .Params.audio }}">
+            </audio>
+          {{ end }}
+          {{ if .Params.instagram }}
+            <div class="subheading mb-3">Performance:</div>
+            {{ partial "ig-embed.html" (dict "id" .Params.instagram ) }}
           {{ end }}
           {{ if .Params.spotify }}
           <div class="subheading mb-3">Original ({{ .Params.originalLength }}):</div>

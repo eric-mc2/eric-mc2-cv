@@ -1,6 +1,6 @@
 ---
 title: "DNC Transit Study"
-date: 2026-08-12T12:00:00-06:00
+date: 2025-02-28T10:47:51-06:00
 featured: true
 description: "Did delegates take Uber or CTA?"
 tags: ["data science", "econometrics", "panel data"]

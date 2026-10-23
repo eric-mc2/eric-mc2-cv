@@ -62,3 +62,8 @@ tag = "tags"
         [markup.goldmark.extensions.passthrough.delimiters]
           block = [['\[', '\]'], ['$$', '$$']]
           inline = [['\(', '\)']]
+
+[privacy]
+  [privacy.instagram]
+    disable = false
+    simple = false
